@@ -289,7 +289,7 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
             {/* Giant Cutout Portrait standing tall and bold in the page */}
             <div 
               style={{ transform: 'translateZ(30px)' }}
-              className="relative w-full flex items-end justify-center overflow-visible pointer-events-none min-h-[440px] sm:min-h-[580px] md:min-h-[700px] lg:min-h-[820px]"
+              className="relative w-full flex items-end justify-center overflow-visible pointer-events-none min-h-[460px] sm:min-h-[620px] md:min-h-[740px] lg:min-h-[860px]"
             >
               <motion.img 
                 src={heroImage} 
@@ -302,11 +302,11 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="w-[165%] xs:w-[145%] sm:w-[130%] md:w-[145%] lg:w-[155%] scale-[1.12] sm:scale-100 origin-bottom max-h-[92vh] object-contain select-none filter drop-shadow-[0_25px_55px_rgba(0,0,0,0.95)] drop-shadow-[0_5px_15px_rgba(52,211,153,0.18)]"
+                className="w-[200%] xs:w-[180%] sm:w-[155%] md:w-[165%] lg:w-[175%] scale-[1.2] sm:scale-[1.15] md:scale-[1.3] lg:scale-[1.35] origin-bottom max-h-[96vh] object-contain select-none filter contrast-[1.03] brightness-[1.04] drop-shadow-[0_25px_65px_rgba(0,0,0,0.85)] drop-shadow-[0_5px_15px_rgba(52,211,153,0.18)]"
               />
 
               {/* Magical Ambient bottom blend gradient mask - guarantees transparent profile blends 100% smoothly with section scrolling */}
-              <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/60 to-transparent pointer-events-none z-10" />
+              <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[var(--bg-primary)] via-[var(--bg-primary)]/30 to-transparent pointer-events-none z-10" />
             </div>
 
             {/* Floating identity label matching the seamless glass look */}

@@ -5,9 +5,14 @@ import { SocialLink } from '../types';
 
 interface ContactProps {
   socials: SocialLink[];
+  isAdminMode: boolean;
+  setAdminMode: (mode: boolean) => void;
+  currentUser: any;
+  isMazen: boolean;
+  setIsAuthOpen: (open: boolean) => void;
 }
 
-export default function Contact({ socials }: ContactProps) {
+export default function Contact({ socials, isAdminMode, setAdminMode, currentUser, isMazen, setIsAuthOpen }: ContactProps) {
   const [copied, setCopied] = useState(false);
 
   // Fallback social references if Snapshot is preparing
@@ -118,6 +123,24 @@ export default function Contact({ socials }: ContactProps) {
           <div className="flex items-center space-x-6 text-[10px] font-mono theme-text-muted uppercase tracking-widest">
             <span className="hover:text-emerald-400 cursor-pointer transition-colors">Security Spec</span>
             <span className="hover:text-emerald-400 cursor-pointer transition-colors">Clean Systems</span>
+            <button
+              onClick={() => {
+                if (currentUser && isMazen) {
+                  setAdminMode(!isAdminMode);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                  setIsAuthOpen(true);
+                }
+              }}
+              className="hover:text-emerald-400 focus:text-emerald-400 cursor-pointer transition-colors border-none p-0 bg-transparent uppercase font-mono tracking-widest flex items-center space-x-1.5 focus:outline-none"
+            >
+              <span>[ System Portal ]</span>
+              {currentUser && isMazen ? (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              ) : (
+                <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 dark:bg-neutral-500" />
+              )}
+            </button>
           </div>
         </div>
       </div>

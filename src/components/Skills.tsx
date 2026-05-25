@@ -72,38 +72,22 @@ export default function Skills({ skills }: SkillsProps) {
         </div>
 
         {/* Professional Horizontal Infinite Marquee Ticker */}
-        <div className="relative w-screen left-[50%] right-[30%] -ml-[50vw] -mr-[50vw] overflow-hidden my-16 py-8 border-y theme-border theme-bg-sec/10 backdrop-blur-[1px] marquee-container select-none">
-          {/* Row 1: Forward scrolling */}
-          <div className="flex overflow-hidden relative w-full mb-4">
-            <div className="animate-marquee flex gap-4 uppercase font-mono py-1">
-              {(filteredSkills.length > 0 ? [...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills] : []).map((s, idx) => (
-                <div
-                  key={`${s.id}-forward-${idx}`}
-                  className="flex items-center space-x-3 theme-card border px-5 py-3 rounded-full hovered:border-neutral-500 transition-colors cursor-pointer"
-                >
-                  <div className="w-5 h-5 rounded flex items-center justify-center theme-bg-page border theme-border">
-                    {renderSkillIcon(s.icon)}
-                  </div>
-                  <span className="font-medium text-[11px] sm:text-xs theme-text-title">{s.name}</span>
-                  <span className="text-[8px] sm:text-[9px] font-mono text-emerald-500/80 dark:text-emerald-400 tracking-widest">{s.category}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Row 2: Reverse scrolling */}
+        <div className="relative w-screen left-[50%] right-[30%] -ml-[50vw] -mr-[50vw] overflow-hidden my-16 py-10 border-y theme-border bg-[linear-gradient(to_right,var(--bg-secondary)_1px,transparent_1px)] bg-[size:24px] marquee-container select-none">
           <div className="flex overflow-hidden relative w-full">
-            <div className="animate-marquee-reverse flex gap-4 uppercase font-mono py-1">
-              {(filteredSkills.length > 0 ? [...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills].reverse() : []).map((s, idx) => (
+            <div className="animate-marquee flex gap-8 uppercase font-mono py-2">
+              {(filteredSkills.length > 0 ? [...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills] : []).map((s, idx) => (
                 <div
-                  key={`${s.id}-reverse-${idx}`}
-                  className="flex items-center space-x-3 theme-card border px-5 py-3 rounded-full hovered:border-neutral-500 transition-colors cursor-pointer"
+                  key={`${s.id}-marquee-${idx}`}
+                  className="flex items-center space-x-3.5 bg-white/70 dark:bg-neutral-900/60 theme-card border theme-border px-6 py-3 rounded-full hover:border-emerald-500/40 transition-all font-mono shadow-[0_2px_8px_rgba(0,0,0,0.02)] sm:hover:-translate-y-0.5"
                 >
-                  <div className="w-5 h-5 rounded flex items-center justify-center theme-bg-page border theme-border">
+                  <div className="w-5 h-5 rounded flex items-center justify-center text-neutral-600 dark:text-neutral-400">
                     {renderSkillIcon(s.icon)}
                   </div>
-                  <span className="font-medium text-[11px] sm:text-xs theme-text-title">{s.name}</span>
-                  <span className="text-[8px] sm:text-[9px] font-mono text-indigo-500/80 dark:text-indigo-400 tracking-widest">{s.category}</span>
+                  <span className="font-semibold text-[11px] tracking-widest theme-text-title">{s.name}</span>
+                  <div className="flex items-center space-x-1.5 pl-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[8px] font-mono text-emerald-600/90 dark:text-emerald-400 tracking-wider transition-colors">{s.category}</span>
+                  </div>
                 </div>
               ))}
             </div>

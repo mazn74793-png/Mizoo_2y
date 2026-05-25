@@ -236,6 +236,5 @@ export const DEFAULT_SOCIALS = [
 
 export const DEFAULT_TEXTS = [
   { id: 'hero-title', key: 'hero-title', value: 'I build digital experiences that feel premium.' },
-  { id: 'hero-desc', key: 'hero-desc', value: 'Elite full-stack engineer and designer obsessed with sub-pixel perfection, extreme system latency optimization, and minimal, futuristic cinematic user interfaces.' },
   { id: 'story-short', key: 'story-short', value: 'I merge high-precision system mechanics with elite aesthetic sensitivity. Drawing inspiration from modern giants like Apple, Stripe and Linear, I believe complex applications must load with zero friction and represent premium durability.' }
 ];

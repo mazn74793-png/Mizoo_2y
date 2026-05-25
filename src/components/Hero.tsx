@@ -14,7 +14,6 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
   
   // Dynamic Config Values
   const titleText = texts.find(t => t.key === 'hero-title')?.value || 'I build digital experiences that feel premium.';
-  const descText = texts.find(t => t.key === 'hero-desc')?.value || 'Elite full-stack engineer and designer obsessed with sub-pixel perfection, extreme system latency optimization, and minimal, futuristic cinematic user interfaces.';
   const heroImage = texts.find(t => t.key === 'hero-image')?.value || '/src/assets/images/motaem_cutout_1779628899218.png';
 
   useEffect(() => {
@@ -231,28 +230,10 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
           initial={{ opacity: 0, y: 35 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-          style={{
-            borderStyle: 'groove',
-            fontStyle: 'italic',
-            textDecorationLine: 'none',
-            fontWeight: 'bold',
-            textAlign: 'left',
-            backgroundColor: '#544e4e'
-          }}
-          className="text-4xl sm:text-6xl md:text-8xl tracking-tight leading-[1.02] text-transparent bg-clip-text bg-gradient-to-b from-neutral-900 via-neutral-700 to-neutral-500 font-bold max-w-4xl"
+          className="text-4xl sm:text-6xl md:text-8xl tracking-tight leading-[1.02] text-transparent bg-clip-text bg-gradient-to-b from-neutral-900 via-neutral-700 to-neutral-500 font-bold max-w-4xl italic text-left w-full"
         >
           {titleText}
         </motion.h1>
-
-        {/* Description details */}
-        <motion.p
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
-          className="mt-8 theme-text-desc font-sans text-sm md:text-xl max-w-3xl font-light leading-relaxed tracking-wide"
-        >
-          {descText}
-        </motion.p>
 
         {/* Buttons and actions */}
         <motion.div

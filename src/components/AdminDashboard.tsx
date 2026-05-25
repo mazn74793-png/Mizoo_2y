@@ -917,7 +917,7 @@ export default function AdminDashboard({
                         <input
                           type="text"
                           required
-                          placeholder="hero-title, hero-desc..."
+                          placeholder="hero-title, story-short..."
                           value={formData.key}
                           onChange={(e) => setFormData({ ...formData, key: e.target.value })}
                           className="w-full bg-neutral-950 border border-neutral-850 p-3 rounded text-xs text-white font-mono"

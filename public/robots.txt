@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Allow: /favicon.svg
+Allow: /googleed4c33e31fee8f7b.html
+
+Sitemap: https://mizoo-2y.vercel.app/sitemap.xml

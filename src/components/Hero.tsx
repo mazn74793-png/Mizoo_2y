@@ -15,6 +15,52 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
   // Dynamic Config Values
   const titleText = texts.find(t => t.key === 'hero-title')?.value || 'I build digital experiences that feel premium.';
   const heroImage = texts.find(t => t.key === 'hero-image')?.value || '/src/assets/images/motaem_cutout_1779628899218.png';
+  const customPhrasesVal = texts.find(t => t.key === 'hero-phrases')?.value;
+
+  // Live Typewriter / Dynamic Storytelling Engine
+  const phrases = customPhrasesVal
+    ? customPhrasesVal.split('\n').map(s => s.trim()).filter(Boolean)
+    : [
+        "Hi, I'm Mazen. 👋",
+        titleText,
+        'I craft bespoke interactive portfolios with fluid visual physics.',
+        'I engineer secure, blazing-fast, and durable full-stack apps.',
+        'I turn complex system requirements into sheer, pixel-perfect design.'
+      ];
+  
+  const [currentText, setCurrentText] = useState('');
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    const fullText = phrases[phraseIndex] || titleText;
+    
+    if (isDeleting) {
+      timer = setTimeout(() => {
+        setCurrentText((prev) => prev.slice(0, -1));
+      }, 15); // Faster, snap-delete rhythm for lighter feel
+    } else {
+      // Snappy and consistent typing speed for premium crispness
+      const typingDelay = Math.random() * 30 + 35; // 35ms - 65ms instead of 45ms - 85ms
+      timer = setTimeout(() => {
+        setCurrentText((prev) => fullText.slice(0, prev.length + 1));
+      }, typingDelay);
+    }
+
+    if (!isDeleting && currentText === fullText) {
+      // Pause on completed text: standard phrases 3.2s, short greeting "Hi, I'm Mazen." is cached for 2s so it fast-forwards smoothly!
+      const pauseDuration = fullText.startsWith("Hi, I'm Mazen") ? 2000 : 3200;
+      timer = setTimeout(() => {
+        setIsDeleting(true);
+      }, pauseDuration);
+    } else if (isDeleting && currentText === '') {
+      setIsDeleting(false);
+      setPhraseIndex((prev) => (prev + 1) % phrases.length);
+    }
+
+    return () => clearTimeout(timer);
+  }, [currentText, isDeleting, phraseIndex, titleText]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -152,6 +198,26 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
       }
+
+      // Draw premium connection networks
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < 110) {
+            const alpha = ((110 - dist) / 110) * 0.15;
+            ctx.strokeStyle = theme === 'dark' 
+              ? `rgba(255, 255, 255, ${alpha * 0.65})` 
+              : `rgba(16, 185, 129, ${alpha * 0.75})`;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
       
       ctx.globalAlpha = 1.0;
       animationFrameId = requestAnimationFrame(render);
@@ -225,15 +291,30 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
           </span>
         </motion.div>
 
-        {/* Massive displaying headline with elegant gradient */}
-        <motion.h1
-          initial={{ opacity: 0, y: 35 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-          className="text-4xl sm:text-6xl md:text-8xl tracking-tight leading-[1.02] text-transparent bg-clip-text bg-gradient-to-b from-neutral-900 via-neutral-700 to-neutral-500 font-bold max-w-4xl italic text-left w-full"
-        >
-          {titleText}
-        </motion.h1>
+        {/* Massive displaying headline with elegant live-typewriter story. We give it minimum dimensions to prevent layout shifts */}
+        <div className="w-full text-left max-w-4xl min-h-[160px] sm:min-h-[220px] md:min-h-[240px] flex flex-col justify-center">
+          <motion.h1
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[1.08] font-bold text-left italic select-none"
+          >
+            <span className={`bg-clip-text text-transparent bg-gradient-to-b ${
+              theme === 'dark' 
+                ? 'from-white via-neutral-200 to-neutral-450' 
+                : 'from-neutral-950 via-neutral-800 to-neutral-500'
+            }`}>
+              {currentText}
+            </span>
+            <span className="inline-block relative ml-2.5">
+              <motion.span
+                animate={{ opacity: [1, 0, 1] }}
+                transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
+                className="inline-block w-1.5 md:w-2.5 h-7 sm:h-11 md:h-16 lg:h-20 bg-emerald-500 rounded-sm shadow-[0_0_15px_rgba(16,185,129,0.7)]"
+              />
+            </span>
+          </motion.h1>
+        </div>
 
         {/* Buttons and actions */}
         <motion.div

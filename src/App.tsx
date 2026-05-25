@@ -101,13 +101,22 @@ export default function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // Unified Database Cache states (Defaulting to hardcoded presets per Pillar guidelines if snap is booting)
-  const [projects, setProjects] = useState<Project[]>(DEFAULT_PROJECTS);
-  const [skills, setSkills] = useState<Skill[]>(DEFAULT_SKILLS);
-  const [services, setServices] = useState<Service[]>(DEFAULT_SERVICES);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(DEFAULT_TESTIMONIALS);
-  const [socials, setSocials] = useState<SocialLink[]>(DEFAULT_SOCIALS);
-  const [texts, setTexts] = useState<TextConfig[]>(DEFAULT_TEXTS);
+  // High-Performance Local Caching Engine for 0ms database delays
+  const getCachedOr = <T,>(key: string, backup: T): T => {
+    try {
+      const cached = localStorage.getItem(`cache_${key}`);
+      return cached ? JSON.parse(cached) : backup;
+    } catch {
+      return backup;
+    }
+  };
+
+  const [projects, setProjects] = useState<Project[]>(() => getCachedOr('projects', DEFAULT_PROJECTS));
+  const [skills, setSkills] = useState<Skill[]>(() => getCachedOr('skills', DEFAULT_SKILLS));
+  const [services, setServices] = useState<Service[]>(() => getCachedOr('services', DEFAULT_SERVICES));
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(() => getCachedOr('testimonials', DEFAULT_TESTIMONIALS));
+  const [socials, setSocials] = useState<SocialLink[]>(() => getCachedOr('socialLinks', DEFAULT_SOCIALS));
+  const [texts, setTexts] = useState<TextConfig[]>(() => getCachedOr('texts', DEFAULT_TEXTS));
 
   // Subscribe to real-time changes inside Firestore databases
   useEffect(() => {
@@ -117,9 +126,11 @@ export default function App() {
       snap.forEach(d => projs.push(d.data() as Project));
       if (projs.length > 0) {
         setProjects(projs);
+        localStorage.setItem('cache_projects', JSON.stringify(projs));
         localStorage.setItem('portfolio_db_seeded_projects', 'true');
       } else if (localStorage.getItem('portfolio_db_seeded_projects') === 'true') {
         setProjects([]);
+        localStorage.removeItem('cache_projects');
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, 'projects'));
 
@@ -128,9 +139,11 @@ export default function App() {
       snap.forEach(d => sks.push(d.data() as Skill));
       if (sks.length > 0) {
         setSkills(sks);
+        localStorage.setItem('cache_skills', JSON.stringify(sks));
         localStorage.setItem('portfolio_db_seeded_skills', 'true');
       } else if (localStorage.getItem('portfolio_db_seeded_skills') === 'true') {
         setSkills([]);
+        localStorage.removeItem('cache_skills');
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, 'skills'));
 
@@ -139,9 +152,11 @@ export default function App() {
       snap.forEach(d => srvs.push(d.data() as Service));
       if (srvs.length > 0) {
         setServices(srvs);
+        localStorage.setItem('cache_services', JSON.stringify(srvs));
         localStorage.setItem('portfolio_db_seeded_services', 'true');
       } else if (localStorage.getItem('portfolio_db_seeded_services') === 'true') {
         setServices([]);
+        localStorage.removeItem('cache_services');
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, 'services'));
 
@@ -150,9 +165,11 @@ export default function App() {
       snap.forEach(d => tsts.push(d.data() as Testimonial));
       if (tsts.length > 0) {
         setTestimonials(tsts);
+        localStorage.setItem('cache_testimonials', JSON.stringify(tsts));
         localStorage.setItem('portfolio_db_seeded_testimonials', 'true');
       } else if (localStorage.getItem('portfolio_db_seeded_testimonials') === 'true') {
         setTestimonials([]);
+        localStorage.removeItem('cache_testimonials');
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, 'testimonials'));
 
@@ -161,9 +178,11 @@ export default function App() {
       snap.forEach(d => scls.push(d.data() as SocialLink));
       if (scls.length > 0) {
         setSocials(scls);
+        localStorage.setItem('cache_socialLinks', JSON.stringify(scls));
         localStorage.setItem('portfolio_db_seeded_socialLinks', 'true');
       } else if (localStorage.getItem('portfolio_db_seeded_socialLinks') === 'true') {
         setSocials([]);
+        localStorage.removeItem('cache_socialLinks');
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, 'socialLinks'));
 
@@ -172,9 +191,11 @@ export default function App() {
       snap.forEach(d => txts.push(d.data() as TextConfig));
       if (txts.length > 0) {
         setTexts(txts);
+        localStorage.setItem('cache_texts', JSON.stringify(txts));
         localStorage.setItem('portfolio_db_seeded_texts', 'true');
       } else if (localStorage.getItem('portfolio_db_seeded_texts') === 'true') {
         setTexts([]);
+        localStorage.removeItem('cache_texts');
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, 'texts'));
 

@@ -236,5 +236,6 @@ export const DEFAULT_SOCIALS = [
 
 export const DEFAULT_TEXTS = [
   { id: 'hero-title', key: 'hero-title', value: 'I build digital experiences that feel premium.' },
-  { id: 'story-short', key: 'story-short', value: 'I merge high-precision system mechanics with elite aesthetic sensitivity. Drawing inspiration from modern giants like Apple, Stripe and Linear, I believe complex applications must load with zero friction and represent premium durability.' }
+  { id: 'story-short', key: 'story-short', value: 'I merge high-precision system mechanics with elite aesthetic sensitivity. Drawing inspiration from modern giants like Apple, Stripe and Linear, I believe complex applications must load with zero friction and represent premium durability.' },
+  { id: 'hero-phrases', key: 'hero-phrases', value: "Hi, I'm Mazen. 👋\nI build digital experiences that feel premium.\nI craft bespoke interactive portfolios with fluid visual physics.\nI engineer secure, blazing-fast, and durable full-stack apps.\nI turn complex system requirements into sheer, pixel-perfect design." }
 ];

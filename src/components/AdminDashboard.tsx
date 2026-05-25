@@ -1308,10 +1308,17 @@ export default function AdminDashboard({
                       </div>
 
                       <div className="md:col-span-2 space-y-1">
-                        <label className="text-[10px] font-mono uppercase text-neutral-500 max-w-xs block">Landing Visual text value</label>
+                        <label className="text-[10px] font-mono uppercase text-neutral-500 max-w-xs block flex flex-wrap items-center gap-2">
+                          <span>Landing Visual text value</span>
+                          {formData.key === 'hero-phrases' && (
+                            <span className="text-emerald-400 text-[10px] font-sans normal-case">
+                              (ملاحظة هامة: ضع كل جملة أو كلمة ترحيبية في سطر منفصل ليقوم محرك الهبرو بكتابتها حركياً تلو الأخرى)
+                            </span>
+                          )}
+                        </label>
                         <textarea
                           required
-                          rows={4}
+                          rows={6}
                           value={formData.value}
                           onChange={(e) => setFormData({ ...formData, value: e.target.value })}
                           className="w-full bg-neutral-950 border border-neutral-850 p-3 rounded text-xs text-white outline-none focus:border-neutral-500 resize-none font-sans"

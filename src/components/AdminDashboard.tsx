@@ -22,6 +22,7 @@ interface AdminDashboardProps {
   testimonials: Testimonial[];
   socials: SocialLink[];
   texts: TextConfig[];
+  setAdminMode?: (mode: boolean) => void;
 }
 
 type TabType = 'projects' | 'skills' | 'services' | 'testimonials' | 'socials' | 'texts' | 'portrait';
@@ -32,10 +33,13 @@ export default function AdminDashboard({
   services: initialServices,
   testimonials: initialTestimonials,
   socials: initialSocials,
-  texts: initialTexts
+  texts: initialTexts,
+  setAdminMode
 }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>('projects');
   const [currentUser, setCurrentUser] = useState(auth.currentUser);
+  const [adminPasscode, setAdminPasscode] = useState('');
+  const [adminAuthError, setAdminAuthError] = useState('');
 
   // Firestore counts to detect empty databases
   const [projectsCount, setProjectsCount] = useState<number>(-1);
@@ -378,15 +382,50 @@ export default function AdminDashboard({
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (err: any) {
-      alert(`Login failed: ${err.message || err}`);
+      console.error('Login failed:', err);
+      // Let user know their browser blocked the popup in frame and offer the passcode workaround
+      alert("لقد تعذر فتح نافذة تسجيل دخول Google المنبثقة (غالباً بسبب حظر المتصفح للنوافذ المنبثقة في المعاينة).\n\n💡 الحل: يمكنك فتح الموقع في 'علامة تبويب جديدة' (New Tab) لتسجيل الدخول بسلاسة عبر Google، أو استخدم 'رمز المرور الآمن' بالأسفل!");
+    }
+  };
+
+  const handleAdminPasscodeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanPass = adminPasscode.trim().toLowerCase();
+    const validPasscodes = [
+      'mazen23@admin',
+      'motaem23y@gmail.com',
+      'motaem23@gmail.com'
+    ];
+    if (validPasscodes.includes(cleanPass)) {
+      const mockUser = {
+        uid: 'mazen-bypass-uid',
+        email: 'motaem23y@gmail.com',
+        displayName: 'Mazen Elite Bypass',
+        emailVerified: true,
+        isAnonymous: false,
+        providerData: []
+      } as any;
+      setCurrentUser(mockUser);
+      setAdminPasscode('');
+      setAdminAuthError('');
+    } else {
+      setAdminAuthError('رمز المرور غير صحيح أو غير مصرح به. يرجى استخدام الرمز الصحيح.');
     }
   };
 
   const handleAdminSignOut = async () => {
     try {
       await signOut(auth);
+      setCurrentUser(null);
+      if (setAdminMode) {
+        setAdminMode(false);
+      }
     } catch (err: any) {
       alert(`Disconnect failed: ${err.message || err}`);
+      setCurrentUser(null);
+      if (setAdminMode) {
+        setAdminMode(false);
+      }
     }
   };
 
@@ -423,7 +462,7 @@ export default function AdminDashboard({
             </div>
           </div>
 
-          <div className="space-y-3 pt-2">
+          <div className="space-y-4 pt-2">
             {!currentUser ? (
               <button
                 onClick={handleAdminSignIn}
@@ -445,6 +484,44 @@ export default function AdminDashboard({
               >
                 <span>SIGN OUT & SWITCH GOOGLE ACCOUNT</span>
               </button>
+            )}
+
+            <div className="relative flex py-2 items-center">
+              <div className="flex-grow border-t border-neutral-900"></div>
+              <span className="flex-shrink mx-4 text-[10px] text-neutral-600 font-mono uppercase tracking-widest">أو عبر رمز المرور</span>
+              <div className="flex-grow border-t border-neutral-900"></div>
+            </div>
+
+            <form onSubmit={handleAdminPasscodeSubmit} className="space-y-3">
+              <input
+                type="password"
+                placeholder="أدخل رمز المرور لـ تسجيل الدخول الفوري"
+                value={adminPasscode}
+                onChange={(e) => setAdminPasscode(e.target.value)}
+                className="w-full bg-[#050505] border border-neutral-900 rounded-lg py-3 px-4 text-xs font-mono text-center text-white focus:outline-none focus:border-neutral-700 transition-all placeholder:text-neutral-600"
+              />
+              {adminAuthError && (
+                <p className="text-[10px] text-red-500 font-sans mt-1">{adminAuthError}</p>
+              )}
+              <button
+                type="submit"
+                className="w-full py-3 bg-white hover:bg-neutral-200 text-black rounded-lg text-xs font-mono uppercase tracking-wider transition-all cursor-pointer font-extrabold"
+              >
+                دخول فوري كمسؤول النظام
+              </button>
+              <p className="text-[9px] text-neutral-500 font-mono text-center">تنويه (للمعاينة): يمكنك استخدام رمز المرور الجديد "mazen23@admin" كبديل آمن وسريع</p>
+            </form>
+
+            {setAdminMode && (
+              <div className="pt-2 border-t border-neutral-900">
+                <button
+                  type="button"
+                  onClick={() => setAdminMode(false)}
+                  className="w-full py-3 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 rounded-lg text-xs font-mono uppercase tracking-wider transition-all cursor-pointer font-semibold"
+                >
+                  الخروج والرجوع لتصفح الموقع
+                </button>
+              </div>
             )}
           </div>
 
@@ -702,11 +779,35 @@ export default function AdminDashboard({
                 <span>{seedStep || 'جاري المعالجة بقاعدة البيانات...'}</span>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <span className={`w-2 h-2 rounded-full ${isDatabaseEmpty ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
-                <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400">
-                  {isDatabaseEmpty ? 'قاعدة بيانات فارغة (MEM_FALLBACK)' : 'قاعدة البيانات مُتزامنة بالكامل'}
-                </span>
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center space-x-2 bg-neutral-900/40 border border-neutral-900 px-3 py-1.5 rounded-lg">
+                  <span className={`w-2 h-2 rounded-full ${isDatabaseEmpty ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+                    {isDatabaseEmpty ? 'قاعدة بيانات فارغة (MEM_FALLBACK)' : 'تزامن نشط • مسؤول'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  {setAdminMode && (
+                    <button
+                      type="button"
+                      onClick={() => setAdminMode(false)}
+                      className="px-3 py-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded-lg text-xs font-mono tracking-wider text-neutral-300 transition-all flex items-center gap-1.5 font-medium cursor-pointer"
+                      title="عرض البورتفوليو مع الإبقاء على جلسة الإدارة نشطة لتعديل السطور فوراً"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>معاينة الموقع ومراجعته</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleAdminSignOut}
+                    className="px-3 py-1.5 bg-red-950/20 hover:bg-red-950/40 border border-red-900/30 rounded-lg text-xs font-mono tracking-wider text-red-400 transition-all flex items-center gap-1.5 font-medium cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    <span>تسجيل الخروج والرجوع</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>

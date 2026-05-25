@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { db, auth, googleProvider, handleFirestoreError } from '../firebase';
+import { 
+  db, auth, googleProvider, handleFirestoreError,
+  DEFAULT_PROJECTS, DEFAULT_SKILLS, DEFAULT_SERVICES, 
+  DEFAULT_TESTIMONIALS, DEFAULT_SOCIALS, DEFAULT_TEXTS 
+} from '../firebase';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import { collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { Project, Skill, Service, Testimonial, SocialLink, TextConfig, OperationType } from '../types';
 import { 
   Plus, Edit, Trash2, Save, X, Layers, Sparkles, Database, Mail, 
-  Code, Eye, Upload, AlertCircle, Files, Settings, UserCheck, User
+  Code, Eye, Upload, AlertCircle, Files, Settings, UserCheck, User, RefreshCw
 } from 'lucide-react';
 
 const metaEnv = (import.meta as any).env || {};
@@ -32,6 +36,19 @@ export default function AdminDashboard({
 }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>('projects');
   const [currentUser, setCurrentUser] = useState(auth.currentUser);
+
+  // Firestore counts to detect empty databases
+  const [projectsCount, setProjectsCount] = useState<number>(-1);
+  const [skillsCount, setSkillsCount] = useState<number>(-1);
+  const [servicesCount, setServicesCount] = useState<number>(-1);
+  const [testimonialsCount, setTestimonialsCount] = useState<number>(-1);
+  const [socialsCount, setSocialsCount] = useState<number>(-1);
+  const [textsCount, setTextsCount] = useState<number>(-1);
+
+  // Operational states for seeding/wiping database
+  const [isSeeding, setIsSeeding] = useState(false);
+  const [isWiping, setIsWiping] = useState(false);
+  const [seedStep, setSeedStep] = useState('');
 
   // Lists synced in real time
   const [liveProjects, setLiveProjects] = useState<Project[]>(initialProjects);
@@ -88,6 +105,130 @@ export default function AdminDashboard({
     localStorage.setItem('cloudinary_upload_preset', val);
   };
 
+  // Seeding/Wiping operations
+  const handleSeedDatabase = async () => {
+    setIsSeeding(true);
+    setSeedStep('جاري تشفير تهيئة الاتصال بقاعدة البيانات...');
+    try {
+      // 1. Seed Projects
+      setSeedStep('جاري شحن المشاريع الافتراضية (Projects)...');
+      for (const p of DEFAULT_PROJECTS) {
+        await setDoc(doc(db, 'projects', p.id), p);
+      }
+
+      // 2. Seed Skills
+      setSeedStep('جاري شحن المهارات (Skills Grid)...');
+      for (const s of DEFAULT_SKILLS) {
+        await setDoc(doc(db, 'skills', s.id), s);
+      }
+
+      // 3. Seed Services
+      setSeedStep('جاري شحن خدمات البورتفوليو (Services)...');
+      for (const s of DEFAULT_SERVICES) {
+        await setDoc(doc(db, 'services', s.id), s);
+      }
+
+      // 4. Seed Testimonials
+      setSeedStep('جاري شحن شهادات العملاء والشركاء (Co-signs)...');
+      for (const t of DEFAULT_TESTIMONIALS) {
+        await setDoc(doc(db, 'testimonials', t.id), t);
+      }
+
+      // 5. Seed Socials
+      setSeedStep('جاري شحن روابط التواصل الاجتماعي (Socials)...');
+      for (const s of DEFAULT_SOCIALS) {
+        await setDoc(doc(db, 'socialLinks', s.id), s);
+      }
+
+      // 6. Seed Texts
+      setSeedStep('جاري شحن نصوص واجهة المستخدم (UI Copy)...');
+      for (const t of DEFAULT_TEXTS) {
+        await setDoc(doc(db, 'texts', t.id), t);
+      }
+      
+      // Also write default hero-image key to texts
+      await setDoc(doc(db, 'texts', 'text-hero-image'), {
+        id: 'text-hero-image',
+        key: 'hero-image',
+        value: '/src/assets/images/motaem_cutout_1779628899218.png'
+      });
+
+      // Set localStorage seed flag
+      localStorage.setItem('portfolio_db_seeded_projects', 'true');
+      localStorage.setItem('portfolio_db_seeded_skills', 'true');
+      localStorage.setItem('portfolio_db_seeded_services', 'true');
+      localStorage.setItem('portfolio_db_seeded_testimonials', 'true');
+      localStorage.setItem('portfolio_db_seeded_socialLinks', 'true');
+      localStorage.setItem('portfolio_db_seeded_texts', 'true');
+
+      setSeedStep('');
+      alert('تم شحن وتهيئة قاعدة البيانات بنجاح تام! 🎉 كل المشاريع والمهارات والنصوص والروابط الآن حية بالكامل في قاعدة البيانات ومتاحة للتعديل والحذف الفوري.');
+    } catch (err: any) {
+      alert(`فشلت عملية تهيئة السجلات: ${err.message || err}`);
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
+  const handleWipeDatabase = async () => {
+    if (!confirm('⚠️ تحذير شديد الخطورة: سيؤدي هذا الإجراء إلى مسح كافة البيانات من السحابة (Firestore) نهائياً! هل أنت متأكد بنسبة 100%؟')) return;
+    setIsWiping(true);
+    setSeedStep('جاري تنظيف وتصفير جداول قاعدة البيانات السحابية...');
+    try {
+      setSeedStep('جاري تصفير المشاريع سحابياً...');
+      for (const p of liveProjects) {
+        await deleteDoc(doc(db, 'projects', p.id));
+      }
+
+      setSeedStep('جاري تصفير مصفوفة المهارات...');
+      for (const s of liveSkills) {
+        await deleteDoc(doc(db, 'skills', s.id));
+      }
+
+      setSeedStep('جاري تصفير قائمة الخدمات...');
+      for (const s of liveServices) {
+        await deleteDoc(doc(db, 'services', s.id));
+      }
+
+      setSeedStep('جاري تصفير آراء العملاء...');
+      for (const t of liveTestimonials) {
+        await deleteDoc(doc(db, 'testimonials', t.id));
+      }
+
+      setSeedStep('جاري تصفير روابط التواصل الاجتماعي...');
+      for (const s of liveSocials) {
+        await deleteDoc(doc(db, 'socialLinks', s.id));
+      }
+
+      setSeedStep('جاري مسح نصوص الواجهة...');
+      for (const t of liveTexts) {
+        await deleteDoc(doc(db, 'texts', t.id));
+      }
+
+      // Reset cache indicators so UI knows that database is empty
+      localStorage.setItem('portfolio_db_seeded_projects', 'true');
+      localStorage.setItem('portfolio_db_seeded_skills', 'true');
+      localStorage.setItem('portfolio_db_seeded_services', 'true');
+      localStorage.setItem('portfolio_db_seeded_testimonials', 'true');
+      localStorage.setItem('portfolio_db_seeded_socialLinks', 'true');
+      localStorage.setItem('portfolio_db_seeded_texts', 'true');
+
+      setLiveProjects([]);
+      setLiveSkills([]);
+      setLiveServices([]);
+      setLiveTestimonials([]);
+      setLiveSocials([]);
+      setLiveTexts([]);
+
+      setSeedStep('');
+      alert('تم مسح وتنظيف قاعدة البيانات بنجاح! قاعدة البيانات السحابية الآن فارغة بالكامل.');
+    } catch (err: any) {
+      alert(`فشلت عملية المسح والتصفير: ${err.message || err}`);
+    } finally {
+      setIsWiping(false);
+    }
+  };
+
   // Unified Form Data object
   const [formData, setFormData] = useState<any>({
     // Project keys
@@ -129,66 +270,96 @@ export default function AdminDashboard({
     const unsubProj = onSnapshot(qProjects, (snap) => {
       const projs: Project[] = [];
       snap.forEach(d => projs.push(d.data() as Project));
-      if (projs.length > 0) {
+      setProjectsCount(snap.size);
+      if (snap.size > 0) {
         setLiveProjects(projs);
         localStorage.setItem('portfolio_db_seeded_projects', 'true');
-      } else if (localStorage.getItem('portfolio_db_seeded_projects') === 'true') {
-        setLiveProjects([]);
+      } else {
+        if (localStorage.getItem('portfolio_db_seeded_projects') === 'true') {
+          setLiveProjects([]);
+        } else {
+          setLiveProjects(initialProjects);
+        }
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, 'projects'));
 
     const unsubSkills = onSnapshot(collection(db, 'skills'), (snap) => {
       const sks: Skill[] = [];
       snap.forEach(d => sks.push(d.data() as Skill));
-      if (sks.length > 0) {
+      setSkillsCount(snap.size);
+      if (snap.size > 0) {
         setLiveSkills(sks);
         localStorage.setItem('portfolio_db_seeded_skills', 'true');
-      } else if (localStorage.getItem('portfolio_db_seeded_skills') === 'true') {
-        setLiveSkills([]);
+      } else {
+        if (localStorage.getItem('portfolio_db_seeded_skills') === 'true') {
+          setLiveSkills([]);
+        } else {
+          setLiveSkills(initialSkills);
+        }
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, 'skills'));
 
     const unsubServ = onSnapshot(collection(db, 'services'), (snap) => {
       const srvs: Service[] = [];
       snap.forEach(d => srvs.push(d.data() as Service));
-      if (srvs.length > 0) {
+      setServicesCount(snap.size);
+      if (snap.size > 0) {
         setLiveServices(srvs);
         localStorage.setItem('portfolio_db_seeded_services', 'true');
-      } else if (localStorage.getItem('portfolio_db_seeded_services') === 'true') {
-        setLiveServices([]);
+      } else {
+        if (localStorage.getItem('portfolio_db_seeded_services') === 'true') {
+          setLiveServices([]);
+        } else {
+          setLiveServices(initialServices);
+        }
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, 'services'));
 
     const unsubTest = onSnapshot(collection(db, 'testimonials'), (snap) => {
       const tsts: Testimonial[] = [];
       snap.forEach(d => tsts.push(d.data() as Testimonial));
-      if (tsts.length > 0) {
+      setTestimonialsCount(snap.size);
+      if (snap.size > 0) {
         setLiveTestimonials(tsts);
         localStorage.setItem('portfolio_db_seeded_testimonials', 'true');
-      } else if (localStorage.getItem('portfolio_db_seeded_testimonials') === 'true') {
-        setLiveTestimonials([]);
+      } else {
+        if (localStorage.getItem('portfolio_db_seeded_testimonials') === 'true') {
+          setLiveTestimonials([]);
+        } else {
+          setLiveTestimonials(initialTestimonials);
+        }
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, 'testimonials'));
 
     const unsubSoc = onSnapshot(collection(db, 'socialLinks'), (snap) => {
       const scls: SocialLink[] = [];
       snap.forEach(d => scls.push(d.data() as SocialLink));
-      if (scls.length > 0) {
+      setSocialsCount(snap.size);
+      if (snap.size > 0) {
         setLiveSocials(scls);
         localStorage.setItem('portfolio_db_seeded_socialLinks', 'true');
-      } else if (localStorage.getItem('portfolio_db_seeded_socialLinks') === 'true') {
-        setLiveSocials([]);
+      } else {
+        if (localStorage.getItem('portfolio_db_seeded_socialLinks') === 'true') {
+          setLiveSocials([]);
+        } else {
+          setLiveSocials(initialSocials);
+        }
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, 'socialLinks'));
 
     const unsubTexts = onSnapshot(collection(db, 'texts'), (snap) => {
       const txts: TextConfig[] = [];
       snap.forEach(d => txts.push(d.data() as TextConfig));
-      if (txts.length > 0) {
+      setTextsCount(snap.size);
+      if (snap.size > 0) {
         setLiveTexts(txts);
         localStorage.setItem('portfolio_db_seeded_texts', 'true');
-      } else if (localStorage.getItem('portfolio_db_seeded_texts') === 'true') {
-        setLiveTexts([]);
+      } else {
+        if (localStorage.getItem('portfolio_db_seeded_texts') === 'true') {
+          setLiveTexts([]);
+        } else {
+          setLiveTexts(initialTexts);
+        }
       }
     }, (err) => handleFirestoreError(err, OperationType.GET, 'texts'));
 
@@ -507,8 +678,119 @@ export default function AdminDashboard({
     { id: 'portrait', label: 'Hero Portrait', icon: User },
   ] as const;
 
+  const isDatabaseEmpty = projectsCount <= 0 || skillsCount <= 0 || servicesCount <= 0;
+
   return (
     <div className="min-h-screen bg-[#050505] text-white pt-24 pb-16 flex flex-col font-sans select-none">
+      
+      {/* High-Tech Database Monitor and Sync Control Hub */}
+      <div className="w-full max-w-7xl mx-auto px-6 md:px-12 mb-8 text-left">
+        <div className="bg-neutral-950 border border-neutral-900 rounded-2xl p-6 md:p-8 relative overflow-hidden shadow-[0_25px_50px_-12px_rgba(0,0,0,0.9)] space-y-6">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-neutral-900/10 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-900/60 pb-5">
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-neutral-500 block mb-1">REAL-TIME ENGINE CONTROL & METRICS</span>
+              <h2 className="text-lg md:text-xl font-sans tracking-tight font-medium text-white flex items-center gap-2">
+                <Database className="w-4 h-4 text-neutral-400" />
+                <span>نظام التزامن والتحكم الفائق بقاعدة البيانات</span>
+              </h2>
+            </div>
+            {isSeeding || isWiping ? (
+              <div className="flex items-center space-x-2 text-xs font-mono text-neutral-400 bg-[#070707] border border-neutral-900 px-3 py-1.5 rounded-lg">
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
+                <span>{seedStep || 'جاري المعالجة بقاعدة البيانات...'}</span>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <span className={`w-2 h-2 rounded-full ${isDatabaseEmpty ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
+                <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+                  {isDatabaseEmpty ? 'قاعدة بيانات فارغة (MEM_FALLBACK)' : 'قاعدة البيانات مُتزامنة بالكامل'}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Project counts panel */}
+            <div className="bg-[#080808] border border-neutral-900/80 rounded-xl p-4 flex flex-col justify-between">
+              <div>
+                <span className="text-[9px] font-mono uppercase text-neutral-500 tracking-wider">PROJECTS INDEX</span>
+                <p className="text-lg font-sans font-medium text-white mt-1">
+                  {projectsCount >= 0 ? `${projectsCount} مشاريع حية` : 'جاري جرد السجلات...'}
+                </p>
+              </div>
+              <p className="text-[10px] text-neutral-500 mt-2 font-mono">
+                {projectsCount > 0 ? '✓ سحابية نشطة حية' : '⚠️ ذاكرة تخزين الكود'}
+              </p>
+            </div>
+
+            {/* Skills count panel */}
+            <div className="bg-[#080808] border border-neutral-900/80 rounded-xl p-4 flex flex-col justify-between">
+              <div>
+                <span className="text-[9px] font-mono uppercase text-neutral-500 tracking-wider">SKILLS GRID</span>
+                <p className="text-lg font-sans font-medium text-white mt-1">
+                  {skillsCount >= 0 ? `${skillsCount} مهارات حية` : 'جاري جرد السجلات...'}
+                </p>
+              </div>
+              <p className="text-[10px] text-neutral-500 mt-2 font-mono">
+                {skillsCount > 0 ? '✓ سحابية نشطة حية' : '⚠️ ذاكرة تخزين الكود'}
+              </p>
+            </div>
+
+            {/* UI copy texts counts panel */}
+            <div className="bg-[#080808] border border-neutral-900/80 rounded-xl p-4 flex flex-col justify-between">
+              <div>
+                <span className="text-[9px] font-mono uppercase text-neutral-500 tracking-wider">UI COPY KEYS</span>
+                <p className="text-lg font-sans font-medium text-white mt-1">
+                  {textsCount >= 0 ? `${textsCount} نصوص حية` : 'جاري جرد السجلات...'}
+                </p>
+              </div>
+              <p className="text-[10px] text-neutral-500 mt-2 font-mono">
+                {textsCount > 0 ? '✓ سحابية نشطة حية' : '⚠️ ذاكرة تخزين الكود'}
+              </p>
+            </div>
+
+            {/* Quick action trigger block */}
+            <div className="bg-[#0c0c0c] border border-neutral-900 rounded-xl p-4 flex flex-col justify-center space-y-2">
+              {isDatabaseEmpty ? (
+                <button
+                  type="button"
+                  onClick={handleSeedDatabase}
+                  disabled={isSeeding || isWiping}
+                  className="w-full flex items-center justify-center space-x-2 py-3 bg-white hover:bg-neutral-200 text-black text-xs font-mono uppercase tracking-wider rounded-lg font-extrabold transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>تفعيل وشحن البيانات</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleWipeDatabase}
+                  disabled={isSeeding || isWiping}
+                  className="w-full flex items-center justify-center space-x-2 py-3 bg-red-950/20 hover:bg-red-950/40 border border-red-900/30 text-red-400 text-xs font-mono uppercase tracking-wider rounded-lg font-semibold transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>تصفير ومسح السجلات</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {isDatabaseEmpty && (
+            <div className="bg-amber-950/10 border border-amber-900/20 rounded-xl p-4 flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <h4 className="text-xs font-bold text-amber-500">منظومة الحماية ترشدك: قاعدة البيانات السحابية فارغة حالياً!</h4>
+                <p className="text-xs text-neutral-400 leading-relaxed font-sans font-medium">
+                  الموقع يعرض الآن نصوصاً ومشاريع نموذجية مخزنة مؤقتاً في ملفات الكود محلياً. لتتمكن من <strong className="text-white">تعديل أو حذف أي مشروع</strong> حياً ليحفظ مباشرة في السحاب، يرجى النقر على زر <strong className="text-white">"تفعيل وشحن البيانات"</strong> بالأعلى. سيقوم النظام بنقل كافة البيانات بنقرة واحدة إلى Cloud Firestore لتتحول فوراً إلى سجلات تفاعلية حية بورتفوليو مازن!
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="w-full max-w-7xl mx-auto px-6 md:px-12 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
         
         {/* Left Side Tab Drawer Rail */}

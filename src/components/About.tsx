@@ -77,7 +77,7 @@ export default function About({ texts }: AboutProps) {
                 className="interactive-card theme-card border p-6 rounded transition-all group flex flex-col justify-between min-h-[220px]"
               >
                 <div>
-                  <div className="w-8 h-8 rounded theme-bg-sec flex items-center justify-center border theme-border theme-text-desc group-hover:text-emerald-400 group-hover:border-emerald-500/30 transition-all mb-6">
+                  <div className="w-8 h-8 rounded theme-bg-sec flex items-center justify-center border theme-border theme-text-desc group-hover:text-neutral-900 dark:group-hover:text-neutral-100 group-hover:border-neutral-900/35 dark:group-hover:border-neutral-100/35 transition-all mb-6">
                     <Icon className="w-4 h-4" />
                   </div>
                   <h3 className="text-sm font-sans font-medium tracking-tight theme-text-title mb-2">

@@ -10,7 +10,7 @@ export default function Services({ services }: ServicesProps) {
   
   const renderServiceIcon = (iconName: string) => {
     const IconComponent = (Icons as any)[iconName] || Icons.Code;
-    return <IconComponent className="w-5 h-5 theme-text-desc group-hover:text-emerald-400 transition-colors" />;
+    return <IconComponent className="w-5 h-5 theme-text-desc group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors" />;
   };
 
   return (
@@ -46,7 +46,7 @@ export default function Services({ services }: ServicesProps) {
                   
                   {/* Icon and title header */}
                   <div className="flex items-center space-x-4 mb-6 text-left">
-                    <div className="w-10 h-10 rounded-lg theme-bg-sec border theme-border flex items-center justify-center group-hover:border-emerald-500/30 transition-all">
+                    <div className="w-10 h-10 rounded-lg theme-bg-sec border theme-border flex items-center justify-center group-hover:border-neutral-900/35 dark:group-hover:border-neutral-100/35 transition-all">
                       {renderServiceIcon(s.icon)}
                     </div>
                     <h3 className="text-lg font-sans font-medium theme-text-title tracking-tight">
@@ -63,7 +63,7 @@ export default function Services({ services }: ServicesProps) {
                 <ul className="space-y-2 border-t theme-border pt-6">
                   {s.features.map((feat, idx) => (
                     <li key={idx} className="flex items-center space-x-2 text-[11px] font-mono theme-text-muted text-left">
-                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-450 dark:bg-neutral-600 group-hover:bg-emerald-400 transition-colors" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-450 dark:bg-neutral-600 group-hover:bg-neutral-900 dark:group-hover:bg-white transition-colors" />
                       <span>{feat}</span>
                     </li>
                   ))}

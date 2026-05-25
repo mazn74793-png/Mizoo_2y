@@ -86,7 +86,7 @@ export default function CustomCursor() {
       {/* Elastic elegant fluid ring tracker */}
       <div
         id="cursor-ring"
-        className="fixed pointer-events-none z-50 w-8 h-8 rounded-full border border-emerald-500/40 dark:border-emerald-400/50 transition-transform duration-150 ease-out flex items-center justify-center bg-emerald-500/[0.03]"
+        className="fixed pointer-events-none z-50 w-8 h-8 rounded-full border border-neutral-900/40 dark:border-neutral-100/50 transition-transform duration-150 ease-out flex items-center justify-center bg-neutral-900/[0.03] dark:bg-white/[0.03]"
         style={{
           left: laggedPosition.x,
           top: laggedPosition.y,
@@ -94,7 +94,7 @@ export default function CustomCursor() {
         }}
       >
         {isHovered && (
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+          <div className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white animate-ping" />
         )}
       </div>
     </>

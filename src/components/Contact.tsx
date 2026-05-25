@@ -74,9 +74,9 @@ export default function Contact({ socials, isAdminMode, setAdminMode, currentUse
               
               <button
                 onClick={handleCopyEmail}
-                className="flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider theme-text-desc hover:text-emerald-400 border theme-border hover:border-emerald-500/30 px-6 py-4.5 rounded transition-all w-full sm:w-auto cursor-pointer"
+                className="flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider theme-text-desc hover:bg-neutral-950/5 dark:hover:bg-white/5 hover:text-neutral-950 dark:hover:text-white border theme-border hover:border-neutral-900/35 dark:hover:border-neutral-100/35 px-6 py-4.5 rounded transition-all w-full sm:w-auto cursor-pointer"
               >
-                {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Mail className="w-4 h-4" />}
+                {copied ? <Check className="w-4 h-4 text-neutral-900 dark:text-neutral-150" /> : <Mail className="w-4 h-4" />}
                 <span>{copied ? 'Copied Secure' : 'Copy Email'}</span>
               </button>
             </div>
@@ -95,7 +95,7 @@ export default function Contact({ socials, isAdminMode, setAdminMode, currentUse
                   className="group p-6 theme-card border rounded flex items-center justify-between transition-all duration-300 interactive-card"
                 >
                   <div className="flex items-center space-x-4">
-                    <div className="w-9 h-9 theme-bg-sec border theme-border rounded flex items-center justify-center theme-text-desc group-hover:text-emerald-400 transition-colors">
+                    <div className="w-9 h-9 theme-bg-sec border theme-border rounded flex items-center justify-center theme-text-desc group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-colors">
                       <IconComp className="w-4 h-4" />
                     </div>
                     <div>
@@ -108,7 +108,7 @@ export default function Contact({ socials, isAdminMode, setAdminMode, currentUse
                     </div>
                   </div>
                   
-                  <ArrowUpRight className="w-4 h-4 theme-text-muted group-hover:text-emerald-400 transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <ArrowUpRight className="w-4 h-4 theme-text-muted group-hover:text-neutral-900 dark:group-hover:text-neutral-100 transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </a>
               );
             })}
@@ -121,8 +121,8 @@ export default function Contact({ socials, isAdminMode, setAdminMode, currentUse
             © {new Date().getFullYear()} MAZEN. ALL DESIGN PRINCIPLES INSPIRED BY APPLE & STRIPE.
           </p>
           <div className="flex items-center space-x-6 text-[10px] font-mono theme-text-muted uppercase tracking-widest">
-            <span className="hover:text-emerald-400 cursor-pointer transition-colors">Security Spec</span>
-            <span className="hover:text-emerald-400 cursor-pointer transition-colors">Clean Systems</span>
+            <span className="hover:text-neutral-900 dark:hover:text-neutral-100 cursor-pointer transition-colors">Security Spec</span>
+            <span className="hover:text-neutral-900 dark:hover:text-neutral-100 cursor-pointer transition-colors">Clean Systems</span>
             <button
               onClick={() => {
                 if (currentUser && isMazen) {
@@ -132,11 +132,11 @@ export default function Contact({ socials, isAdminMode, setAdminMode, currentUse
                   setIsAuthOpen(true);
                 }
               }}
-              className="hover:text-emerald-400 focus:text-emerald-400 cursor-pointer transition-colors border-none p-0 bg-transparent uppercase font-mono tracking-widest flex items-center space-x-1.5 focus:outline-none"
+              className="hover:text-neutral-900 dark:hover:text-neutral-100 focus:text-neutral-900 dark:focus:text-neutral-100 cursor-pointer transition-colors border-none p-0 bg-transparent uppercase font-mono tracking-widest flex items-center space-x-1.5 focus:outline-none"
             >
               <span>[ System Portal ]</span>
               {currentUser && isMazen ? (
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white animate-pulse" />
               ) : (
                 <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 dark:bg-neutral-500" />
               )}

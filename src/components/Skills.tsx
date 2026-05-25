@@ -78,15 +78,15 @@ export default function Skills({ skills }: SkillsProps) {
               {(filteredSkills.length > 0 ? [...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills, ...filteredSkills] : []).map((s, idx) => (
                 <div
                   key={`${s.id}-marquee-${idx}`}
-                  className="flex items-center space-x-3.5 bg-white/70 dark:bg-neutral-900/60 theme-card border theme-border px-6 py-3 rounded-full hover:border-emerald-500/40 transition-all font-mono shadow-[0_2px_8px_rgba(0,0,0,0.02)] sm:hover:-translate-y-0.5"
+                  className="flex items-center space-x-3.5 bg-white/70 dark:bg-neutral-900/60 theme-card border theme-border px-6 py-3 rounded-full hover:border-neutral-950/25 dark:hover:border-neutral-300/40 transition-all font-mono shadow-[0_2px_8px_rgba(0,0,0,0.02)] sm:hover:-translate-y-0.5"
                 >
                   <div className="w-5 h-5 rounded flex items-center justify-center text-neutral-600 dark:text-neutral-400">
                     {renderSkillIcon(s.icon)}
                   </div>
                   <span className="font-semibold text-[11px] tracking-widest theme-text-title">{s.name}</span>
                   <div className="flex items-center space-x-1.5 pl-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[8px] font-mono text-emerald-600/90 dark:text-emerald-400 tracking-wider transition-colors">{s.category}</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-neutral-200 animate-pulse" />
+                    <span className="text-[8px] font-mono theme-text-muted tracking-wider transition-colors">{s.category}</span>
                   </div>
                 </div>
               ))}

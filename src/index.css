@@ -136,11 +136,11 @@ html {
 
 .interactive-card:hover {
   transform: translateY(-5px) scale(1.006) !important;
-  box-shadow: 0 16px 36px -12px rgba(0,0,0,0.1), 0 0 0 1.5px rgba(16, 185, 129, 0.25) !important;
+  box-shadow: 0 16px 36px -12px rgba(0,0,0,0.18), 0 0 0 1.5px rgba(255, 255, 255, 0.12) !important;
 }
 
 .light .interactive-card:hover {
-  box-shadow: 0 16px 36px -12px rgba(0,0,0,0.06), 0 0 0 1.5px rgba(16, 185, 129, 0.3) !important;
+  box-shadow: 0 16px 36px -12px rgba(0,0,0,0.06), 0 0 0 1.5px rgba(0, 0, 0, 0.08) !important;
 }
 
 

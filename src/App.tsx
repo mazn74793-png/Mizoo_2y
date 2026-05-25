@@ -260,7 +260,7 @@ export default function App() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 10 }}
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full bg-white/95 dark:bg-neutral-900/95 border border-neutral-200 dark:border-neutral-800 shadow-xl flex items-center justify-center cursor-pointer select-none text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:scale-105 active:scale-95 transition-all"
+            className="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full bg-white/95 dark:bg-neutral-900/95 border border-neutral-200 dark:border-neutral-800 shadow-xl flex items-center justify-center cursor-pointer select-none text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-900/50 dark:focus:ring-neutral-100/50 hover:scale-105 active:scale-95 transition-all"
             aria-label="Scroll back to top"
           >
             {/* Round animated tracker progress ring */}
@@ -277,7 +277,7 @@ export default function App() {
                 cx="22"
                 cy="22"
                 r="19"
-                className="stroke-emerald-500"
+                className="stroke-neutral-900 dark:stroke-neutral-100"
                 strokeWidth="2"
                 fill="transparent"
                 strokeDasharray="119.38"
@@ -285,7 +285,7 @@ export default function App() {
                 strokeLinecap="round"
               />
             </svg>
-            <ArrowUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <ArrowUp className="w-4 h-4 text-neutral-900 dark:text-neutral-100" />
           </motion.button>
         )}
       </AnimatePresence>

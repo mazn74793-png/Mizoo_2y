@@ -181,7 +181,7 @@ export default function Projects({ projects }: ProjectsProps) {
           <span className="text-[10px] font-mono theme-text-muted">01</span>
           <div className="h-0.5 flex-1 theme-bg-sec rounded-full overflow-hidden relative">
             <div 
-              className="absolute left-0 top-0 bottom-0 bg-emerald-500 rounded-full transition-all duration-150 ease-out"
+              className="absolute left-0 top-0 bottom-0 bg-neutral-900 dark:bg-neutral-100 rounded-full transition-all duration-150 ease-out"
               style={{ width: `${scrollProgress}%` }}
             />
           </div>

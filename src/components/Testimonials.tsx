@@ -59,7 +59,7 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
                 </div>
 
                 {/* Micro visual indicator dots */}
-                <div className="absolute top-6 right-6 w-1.5 h-1.5 rounded-full theme-bg-sec group-hover:bg-emerald-400 transition-colors" />
+                <div className="absolute top-6 right-6 w-1.5 h-1.5 rounded-full theme-bg-sec group-hover:bg-neutral-900 dark:group-hover:bg-white transition-colors" />
               </motion.div>
             ))}
         </div>

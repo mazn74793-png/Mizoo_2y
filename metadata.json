@@ -1,0 +1,6 @@
+{
+  "name": "Mazen Portfolio",
+  "description": "Cinematic ultra-premium developer portfolio website for Mazen, an elite full-stack engineer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

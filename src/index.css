@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+* {
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none !important;
+}
+
+*:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-reverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee-reverse {
+  display: flex;
+  width: max-content;
+  animation: marquee-reverse 40s linear infinite;
+}
+
+.marquee-container {
+  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+}
+
+/* High-contrast Alabaster Light & Cosmic Dark variables */
+:root {
+  --bg-primary: #050505;
+  --bg-secondary: #0d0d0d;
+  --bg-card: rgba(13, 13, 13, 0.45);
+  --bg-card-hover: rgba(20, 20, 20, 0.6);
+  --border-color: #1a1a1a;
+  --text-primary: #ffffff;
+  --text-secondary: #a3a3a3;
+  --text-muted: #525252;
+}
+
+.light {
+  --bg-primary: #fbfbfa; /* Warm Alabaster */
+  --bg-secondary: #f4f4f0; /* Soft Clay Gray */
+  --bg-card: #ffffff; /* Beautiful White Card */
+  --bg-card-hover: #fcfcf9;
+  --border-color: #deded6; /* Soft subtle light grid border */
+  --text-primary: #151515; /* Luxurious charcoal black */
+  --text-secondary: #555550; /* High legibility dark gray */
+  --text-muted: #8c8c82; /* Muted gray specs */
+}
+
+/* Luxury Theme transition utilities */
+.theme-bg-page {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  transition: background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-bg-sec {
+  background-color: var(--bg-secondary) !important;
+  transition: background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+  transition: background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), 
+              color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.12s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-card:hover {
+  background-color: var(--bg-card-hover) !important;
+  border-color: var(--border-color) !important;
+}
+
+.theme-border {
+  border-color: var(--border-color) !important;
+  transition: border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-text-title {
+  color: var(--text-primary) !important;
+  transition: color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-text-desc {
+  color: var(--text-secondary) !important;
+  transition: color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-text-muted {
+  color: var(--text-muted) !important;
+  transition: color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
+
+

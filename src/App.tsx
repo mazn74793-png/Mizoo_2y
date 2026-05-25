@@ -3,7 +3,7 @@ import { db, handleFirestoreError, DEFAULT_PROJECTS, DEFAULT_SKILLS, DEFAULT_SER
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { signInWithPopup, signOut, User } from 'firebase/auth';
 import { motion, AnimatePresence } from 'motion/react';
-import { Lock, Unlock, LogOut, ChevronRight } from 'lucide-react';
+import { Lock, Unlock, LogOut, ChevronRight, ArrowUp } from 'lucide-react';
 import { Project, Skill, Service, Testimonial, SocialLink, TextConfig, OperationType } from './types';
 
 // Component imports
@@ -63,6 +63,9 @@ export default function App() {
     root.classList.remove('dark');
     localStorage.setItem('portfolio_theme', 'light');
   }, [theme]);
+
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Unified Database Cache states (Defaulting to hardcoded presets per Pillar guidelines if snap is booting)
   const [projects, setProjects] = useState<Project[]>(DEFAULT_PROJECTS);
@@ -144,6 +147,14 @@ export default function App() {
     // Handle scroll offset section matching
     const handleScrollTracking = () => {
       if (isAdminMode) return;
+
+      // Track scroll progress
+      const currentScroll = window.scrollY;
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalHeight > 0) {
+        setScrollProgress((currentScroll / totalHeight) * 100);
+      }
+      setShowScrollTop(currentScroll > 400);
       
       const offsets = ['work', 'about', 'skills', 'services', 'contact'].map((sectionId) => {
         const el = document.getElementById(sectionId);
@@ -154,7 +165,6 @@ export default function App() {
         return { id: sectionId, top: 0 };
       });
 
-      const currentScroll = window.scrollY;
       const matched = offsets.reduce((prev, curr) => {
         if (currentScroll >= curr.top) {
           return curr;
@@ -241,6 +251,44 @@ export default function App() {
           texts={texts}
         />
       )}
+
+      {/* Elite Circular Scroll-To-Top indicator */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 10 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full bg-white/95 dark:bg-neutral-900/95 border border-neutral-200 dark:border-neutral-800 shadow-xl flex items-center justify-center cursor-pointer select-none text-neutral-800 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 hover:scale-105 active:scale-95 transition-all"
+            aria-label="Scroll back to top"
+          >
+            {/* Round animated tracker progress ring */}
+            <svg className="absolute inset-0 w-full h-full -rotate-90">
+              <circle
+                cx="22"
+                cy="22"
+                r="19"
+                className="stroke-neutral-100 dark:stroke-neutral-800"
+                strokeWidth="1.5"
+                fill="transparent"
+              />
+              <circle
+                cx="22"
+                cy="22"
+                r="19"
+                className="stroke-emerald-500"
+                strokeWidth="2"
+                fill="transparent"
+                strokeDasharray="119.38"
+                strokeDashoffset={119.38 - (119.38 * scrollProgress) / 100}
+                strokeLinecap="round"
+              />
+            </svg>
+            <ArrowUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
       {/* Auth Modal Tunnel */}
       <AnimatePresence>

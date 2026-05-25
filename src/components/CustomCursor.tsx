@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 export default function CustomCursor() {
   const [position, setPosition] = useState({ x: -100, y: -100 });
+  const [laggedPosition, setLaggedPosition] = useState({ x: -100, y: -100 });
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -44,18 +45,59 @@ export default function CustomCursor() {
     };
   }, []);
 
+  // Soft elastic lag tracking
+  useEffect(() => {
+    if (isTouchDevice || !isVisible) return;
+    
+    let animationFrameId: number;
+    
+    const updateLaggedPosition = () => {
+      setLaggedPosition(prev => {
+        const dx = position.x - prev.x;
+        const dy = position.y - prev.y;
+        // Adjust the multiplier for custom elasticity lag
+        return {
+          x: prev.x + dx * 0.16,
+          y: prev.y + dy * 0.16
+        };
+      });
+      animationFrameId = requestAnimationFrame(updateLaggedPosition);
+    };
+    
+    animationFrameId = requestAnimationFrame(updateLaggedPosition);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [position, isTouchDevice, isVisible]);
+
   if (isTouchDevice || !isVisible) return null;
 
   return (
-    <div
-      id="cursor-dot"
-      className="fixed pointer-events-none z-50 mix-blend-difference w-2.5 h-2.5 bg-white rounded-full transition-transform duration-200 ease-out"
-      style={{
-        left: position.x,
-        top: position.y,
-        transform: `translate(-50%, -50%) scale(${isHovered ? 1.6 : 1.0})`,
-      }}
-    />
+    <>
+      {/* Absolute core sharp pointer */}
+      <div
+        id="cursor-dot"
+        className="fixed pointer-events-none z-50 mix-blend-difference w-1.5 h-1.5 bg-white rounded-full"
+        style={{
+          left: position.x,
+          top: position.y,
+          transform: 'translate(-50%, -50%)',
+        }}
+      />
+      
+      {/* Elastic elegant fluid ring tracker */}
+      <div
+        id="cursor-ring"
+        className="fixed pointer-events-none z-50 w-8 h-8 rounded-full border border-emerald-500/40 dark:border-emerald-400/50 transition-transform duration-150 ease-out flex items-center justify-center bg-emerald-500/[0.03]"
+        style={{
+          left: laggedPosition.x,
+          top: laggedPosition.y,
+          transform: `translate(-50%, -50%) scale(${isHovered ? 1.6 : 1.0})`,
+        }}
+      >
+        {isHovered && (
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+        )}
+      </div>
+    </>
   );
 }
 

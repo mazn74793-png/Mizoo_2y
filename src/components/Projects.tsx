@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Project } from '../types';
-import { ArrowUpRight, Github, ExternalLink, X, Globe, Code } from 'lucide-react';
+import { ArrowUpRight, Github, ExternalLink, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProjectsProps {
   projects: Project[];
@@ -9,6 +9,47 @@ interface ProjectsProps {
 
 export default function Projects({ projects }: ProjectsProps) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const handleScroll = () => {
+    if (sliderRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
+      const totalScrollable = scrollWidth - clientWidth;
+      
+      setScrollProgress(totalScrollable > 0 ? (scrollLeft / totalScrollable) * 100 : 0);
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft < totalScrollable - 10);
+    }
+  };
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (sliderRef.current) {
+      const { scrollLeft, clientWidth } = sliderRef.current;
+      const scrollAmount = clientWidth * 0.75;
+      sliderRef.current.scrollTo({
+        left: direction === 'left' ? scrollLeft - scrollAmount : scrollLeft + scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  useEffect(() => {
+    const el = sliderRef.current;
+    if (el) {
+      el.addEventListener('scroll', handleScroll, { passive: true });
+      // Run once immediately
+      handleScroll();
+      // Re-run on resize
+      window.addEventListener('resize', handleScroll);
+    }
+    return () => {
+      if (el) el.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [projects]);
 
   return (
     <section 
@@ -26,30 +67,62 @@ export default function Projects({ projects }: ProjectsProps) {
               Selected works built for heavy scale and luxury visual fidelity.
             </h2>
           </div>
-          <div className="text-xs font-mono theme-text-muted">
-            [CLICK ANY CARD TO SYSTEM-EXPAND CASE STUDY]
+          
+          {/* Circular Control Buttons */}
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-mono theme-text-muted hidden sm:inline">
+              [SWIPE OR SCROLL TO NAVIGATE]
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => scroll('left')}
+                disabled={!canScrollLeft}
+                className={`w-10 h-10 rounded-full border theme-border flex items-center justify-center transition-all ${
+                  canScrollLeft
+                    ? 'theme-bg-sec theme-text-title hover:border-emerald-500/50 cursor-pointer active:scale-95'
+                    : 'opacity-30 cursor-not-allowed'
+                }`}
+                aria-label="Scroll left"
+              >
+                <ChevronLeft className="w-5 h-5 text-neutral-800 dark:text-neutral-200" />
+              </button>
+              <button
+                onClick={() => scroll('right')}
+                disabled={!canScrollRight}
+                className={`w-10 h-10 rounded-full border theme-border flex items-center justify-center transition-all ${
+                  canScrollRight
+                    ? 'theme-bg-sec theme-text-title hover:border-emerald-500/50 cursor-pointer active:scale-95'
+                    : 'opacity-30 cursor-not-allowed'
+                }`}
+                aria-label="Scroll right"
+              >
+                <ChevronRight className="w-5 h-5 text-neutral-800 dark:text-neutral-200" />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Project showcase layout - horizontal swiper on mobile, multi-column grid on desktop */}
-        <div className="flex sm:grid overflow-x-auto sm:overflow-visible gap-4 sm:gap-6 md:gap-8 max-sm:-mx-6 max-sm:px-6 max-sm:pb-6 max-sm:snap-x max-sm:-mt-4 scrollbar-none sm:grid-cols-2 lg:grid-cols-3 w-full">
+        {/* Project horizontal scrollable strip (swiper) */}
+        <div 
+          ref={sliderRef}
+          className="flex overflow-x-auto gap-6 sm:gap-8 pb-8 scrollbar-none snap-x snap-mandatory w-full scroll-smooth select-none cursor-grab active:cursor-grabbing"
+        >
           {projects
             .sort((a, b) => a.order - b.order)
             .map((p, index) => {
-              const isEven = index % 2 === 0;
               return (
                 <motion.div
                   key={p.id}
-                  initial={{ opacity: 0, x: isEven ? -100 : 100, y: 15, scale: 0.94 }}
-                  whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-                  viewport={{ once: true, margin: '-60px' }}
-                  transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1], delay: (index % 3) * 0.08 }}
+                  initial={{ opacity: 0, y: 15, scale: 0.98 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true, margin: '-20px' }}
+                  transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: (index % 3) * 0.05 }}
                   onClick={() => setSelectedProject(p)}
-                  className="group cursor-pointer theme-card border rounded-xl overflow-hidden select-none transition-all interactive-card flex flex-col justify-between min-w-[275px] xs:min-w-[315px] sm:min-w-0 max-sm:snap-center"
+                  className="group cursor-pointer theme-card border rounded-xl overflow-hidden select-none transition-all duration-300 interactive-card flex flex-col justify-between w-[290px] xs:w-[325px] sm:w-[370px] md:w-[410px] flex-shrink-0 snap-center shadow-md pb-1"
                 >
                   <div className="w-full">
                     {/* Visual Preview Container */}
-                    <div className="relative aspect-video w-full overflow-hidden theme-bg-sec flex items-center justify-center">
+                    <div className="relative aspect-video w-full overflow-hidden theme-bg-sec flex items-center justify-center border-b theme-border">
                       <img
                         src={p.imageUrl}
                         alt={p.title}
@@ -57,18 +130,20 @@ export default function Projects({ projects }: ProjectsProps) {
                         referrerPolicy="no-referrer"
                       />
                       
+                      {/* Premium Glass reflection overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 opacity-60 group-hover:opacity-100 transition-opacity" />
+
                       {/* Glass overlay on Hover */}
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
                         <span className="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-white border border-white/20 bg-black/45 px-3 py-1.5 rounded-full flex items-center space-x-1.5 backdrop-blur-md">
                           <span>Explore Engine</span>
-                          <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                          <ArrowUpRight className="w-3.5 h-3.5" />
                         </span>
                       </div>
                     </div>
 
                     {/* Information Area with beautifully tuned responsive padding */}
-                    <div className="p-3.5 sm:p-6 text-left">
-                      
+                    <div className="p-4.5 sm:p-6 text-left">
                       {/* Tech stack badges list */}
                       <div className="flex flex-wrap gap-1 sm:gap-2 mb-3">
                         {p.techStack.slice(0, 3).map((tech) => (
@@ -86,7 +161,7 @@ export default function Projects({ projects }: ProjectsProps) {
                         )}
                       </div>
 
-                      {/* Title and brief - responsive sizes for snug layout */}
+                      {/* Title and brief */}
                       <h3 className="text-xs sm:text-base font-sans font-medium theme-text-title tracking-tight transition-colors mb-1.5 flex items-center justify-between">
                         <span className="truncate">{p.title}</span>
                       </h3>
@@ -99,6 +174,20 @@ export default function Projects({ projects }: ProjectsProps) {
                 </motion.div>
               );
             })}
+        </div>
+
+        {/* Horizontal Navigation Progress Line */}
+        <div className="mt-8 flex items-center justify-between gap-6 max-w-md mx-auto">
+          <span className="text-[10px] font-mono theme-text-muted">01</span>
+          <div className="h-0.5 flex-1 theme-bg-sec rounded-full overflow-hidden relative">
+            <div 
+              className="absolute left-0 top-0 bottom-0 bg-emerald-500 rounded-full transition-all duration-150 ease-out"
+              style={{ width: `${scrollProgress}%` }}
+            />
+          </div>
+          <span className="text-[10px] font-mono theme-text-muted">
+            {String(projects.length).padStart(2, '0')}
+          </span>
         </div>
       </div>
 

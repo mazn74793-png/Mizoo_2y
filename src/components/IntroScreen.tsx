@@ -25,20 +25,20 @@ export default function IntroScreen({ onComplete, heroImage }: IntroScreenProps)
   }, [heroImage]);
 
   useEffect(() => {
-    // Elegant, ultra-fast cinematic transitions of welcome greetings for instant load feel
+    // Elegant, slow cinematic transitions of welcome greetings
     const interval = setInterval(() => {
       setIndex((prev) => {
         if (prev === WELCOMES.length - 1) {
           clearInterval(interval);
           setTimeout(() => {
             setStage('fade-out');
-            setTimeout(onComplete, 350); // Fast crisp fade-out
-          }, 350);
+            setTimeout(onComplete, 700); // Wait for final crisp fade-out
+          }, 700);
           return prev;
         }
         return prev + 1;
       });
-    }, 400); // 400ms instead of 850ms for snappy load-up
+    }, 850);
 
     return () => clearInterval(interval);
   }, [onComplete]);

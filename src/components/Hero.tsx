@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { TextConfig } from '../types';
@@ -18,15 +18,19 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
   const customPhrasesVal = texts.find(t => t.key === 'hero-phrases')?.value;
 
   // Live Typewriter / Dynamic Storytelling Engine
-  const phrases = customPhrasesVal
-    ? customPhrasesVal.split('\n').map(s => s.trim()).filter(Boolean)
-    : [
-        "Hi, I'm Mazen. 👋",
-        titleText,
-        'I craft bespoke interactive portfolios with fluid visual physics.',
-        'I engineer secure, blazing-fast, and durable full-stack apps.',
-        'I turn complex system requirements into sheer, pixel-perfect design.'
-      ];
+  // Memoize phrases so its reference is 100% stable during non-typewriter state updates
+  const phrases = useMemo(() => {
+    if (customPhrasesVal && customPhrasesVal.trim() !== '') {
+      return customPhrasesVal.split('\n').map(s => s.trim()).filter(Boolean);
+    }
+    return [
+      "Hi, I'm Mazen. 👋",
+      titleText,
+      'I craft bespoke interactive portfolios with fluid visual physics.',
+      'I engineer secure, blazing-fast, and durable full-stack apps.',
+      'I turn complex system requirements into sheer, pixel-perfect design.'
+    ];
+  }, [customPhrasesVal, titleText]);
   
   const [currentText, setCurrentText] = useState('');
   const [phraseIndex, setPhraseIndex] = useState(0);
@@ -34,33 +38,36 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    const fullText = phrases[phraseIndex] || titleText;
+    
+    // Safety check for empty lists to prevent NaN or index errors
+    const list = phrases.length > 0 ? phrases : [titleText];
+    const safeIndex = phraseIndex % list.length;
+    const fullText = list[safeIndex] || titleText;
     
     if (isDeleting) {
       timer = setTimeout(() => {
         setCurrentText((prev) => prev.slice(0, -1));
-      }, 15); // Faster, snap-delete rhythm for lighter feel
+      }, 15); // Faster backspace rhythm for responsive elite feedback
     } else {
-      // Snappy and consistent typing speed for premium crispness
-      const typingDelay = Math.random() * 30 + 35; // 35ms - 65ms instead of 45ms - 85ms
+      const typingDelay = Math.random() * 25 + 30; // 30ms - 55ms crisp consistent flow
       timer = setTimeout(() => {
         setCurrentText((prev) => fullText.slice(0, prev.length + 1));
       }, typingDelay);
     }
 
     if (!isDeleting && currentText === fullText) {
-      // Pause on completed text: standard phrases 3.2s, short greeting "Hi, I'm Mazen." is cached for 2s so it fast-forwards smoothly!
-      const pauseDuration = fullText.startsWith("Hi, I'm Mazen") ? 2000 : 3200;
+      const isGreeting = fullText.startsWith("Hi, I'm") || fullText.startsWith("Hi,") || fullText.length < 20;
+      const pauseDuration = isGreeting ? 2000 : 3200; // Pause less on the intro greeting for snap flow
       timer = setTimeout(() => {
         setIsDeleting(true);
       }, pauseDuration);
     } else if (isDeleting && currentText === '') {
       setIsDeleting(false);
-      setPhraseIndex((prev) => (prev + 1) % phrases.length);
+      setPhraseIndex((prev) => (list.length > 0 ? (prev + 1) % list.length : 0));
     }
 
     return () => clearTimeout(timer);
-  }, [currentText, isDeleting, phraseIndex, titleText]);
+  }, [currentText, isDeleting, phraseIndex, phrases, titleText]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -291,19 +298,15 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
           </span>
         </motion.div>
 
-        {/* Massive displaying headline with elegant live-typewriter story. We give it minimum dimensions to prevent layout shifts */}
-        <div className="w-full text-left max-w-4xl min-h-[160px] sm:min-h-[220px] md:min-h-[240px] flex flex-col justify-center">
+        {/* Massive displaying headline with elegant live-typewriter story. We lock the height to prevent bouncing layout shifts on wraps */}
+        <div className="w-full text-left max-w-4xl h-[170px] xs:h-[150px] sm:h-[185px] md:h-[210px] lg:h-[250px] flex flex-col justify-center overflow-hidden">
           <motion.h1
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[1.08] font-bold text-left italic select-none"
+            className="text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[1.08] font-bold text-left italic select-none"
           >
-            <span className={`bg-clip-text text-transparent bg-gradient-to-b ${
-              theme === 'dark' 
-                ? 'from-white via-neutral-200 to-neutral-450' 
-                : 'from-neutral-950 via-neutral-800 to-neutral-500'
-            }`}>
+            <span className={theme === 'dark' ? 'text-white' : 'text-neutral-950'}>
               {currentText}
             </span>
             <span className="inline-block relative ml-2.5">

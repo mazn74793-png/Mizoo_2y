@@ -45,25 +45,27 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
     const fullText = list[safeIndex] || titleText;
     
     if (isDeleting) {
-      timer = setTimeout(() => {
-        setCurrentText((prev) => prev.slice(0, -1));
-      }, 15); // Faster backspace rhythm for responsive elite feedback
+      if (currentText === '') {
+        setIsDeleting(false);
+        setPhraseIndex((prev) => (list.length > 0 ? (prev + 1) % list.length : 0));
+      } else {
+        timer = setTimeout(() => {
+          setCurrentText((prev) => prev.slice(0, -1));
+        }, 15); // Faster backspace rhythm for responsive elite feedback
+      }
     } else {
-      const typingDelay = Math.random() * 25 + 30; // 30ms - 55ms crisp consistent flow
-      timer = setTimeout(() => {
-        setCurrentText((prev) => fullText.slice(0, prev.length + 1));
-      }, typingDelay);
-    }
-
-    if (!isDeleting && currentText === fullText) {
-      const isGreeting = fullText.startsWith("Hi, I'm") || fullText.startsWith("Hi,") || fullText.length < 20;
-      const pauseDuration = isGreeting ? 2000 : 3200; // Pause less on the intro greeting for snap flow
-      timer = setTimeout(() => {
-        setIsDeleting(true);
-      }, pauseDuration);
-    } else if (isDeleting && currentText === '') {
-      setIsDeleting(false);
-      setPhraseIndex((prev) => (list.length > 0 ? (prev + 1) % list.length : 0));
+      if (currentText === fullText) {
+        const isGreeting = fullText.startsWith("Hi, I'm") || fullText.startsWith("Hi,") || fullText.length < 20;
+        const pauseDuration = isGreeting ? 2000 : 3200; // Pause less on the intro greeting for snap flow
+        timer = setTimeout(() => {
+          setIsDeleting(true);
+        }, pauseDuration);
+      } else {
+        const typingDelay = Math.random() * 25 + 30; // 30ms - 55ms crisp consistent flow
+        timer = setTimeout(() => {
+          setCurrentText((prev) => fullText.slice(0, prev.length + 1));
+        }, typingDelay);
+      }
     }
 
     return () => clearTimeout(timer);
@@ -298,22 +300,22 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
           </span>
         </motion.div>
 
-        {/* Massive displaying headline with elegant live-typewriter story. We lock the height to prevent bouncing layout shifts on wraps */}
-        <div className="w-full text-left max-w-4xl h-[170px] xs:h-[150px] sm:h-[185px] md:h-[210px] lg:h-[250px] flex flex-col justify-center overflow-hidden">
+        {/* Massive displaying headline with elegant live-typewriter story. We use min-height and overflow-visible to completely prevent clipping and layout jumps */}
+        <div className="w-full text-center max-w-4xl min-h-[140px] xs:min-h-[120px] sm:min-h-[180px] md:min-h-[220px] lg:min-h-[265px] flex flex-col justify-center overflow-visible px-2 sm:px-4">
           <motion.h1
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="text-3xl xs:text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[1.08] font-bold text-left italic select-none"
+            className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-tight leading-[1.12] font-bold text-center italic select-none py-1"
           >
             <span className={theme === 'dark' ? 'text-white' : 'text-neutral-950'}>
               {currentText}
             </span>
-            <span className="inline-block relative ml-2.5">
+            <span className="inline-block relative ml-2">
               <motion.span
                 animate={{ opacity: [1, 0, 1] }}
                 transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
-                className="inline-block w-1.5 md:w-2.5 h-7 sm:h-11 md:h-16 lg:h-20 bg-emerald-500 rounded-sm shadow-[0_0_15px_rgba(16,185,129,0.7)]"
+                className="inline-block w-1.5 md:w-2 h-7 sm:h-11 md:h-14 lg:h-16 xl:h-20 bg-emerald-500 rounded-sm shadow-[0_0_15px_rgba(16,185,129,0.7)]"
               />
             </span>
           </motion.h1>

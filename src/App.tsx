@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { db, handleFirestoreError, DEFAULT_PROJECTS, DEFAULT_SKILLS, DEFAULT_SERVICES, DEFAULT_TESTIMONIALS, DEFAULT_SOCIALS, DEFAULT_TEXTS, auth, googleProvider } from './firebase';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, doc, setDoc } from 'firebase/firestore';
 import { signInWithPopup, signOut, User } from 'firebase/auth';
 import { motion, AnimatePresence } from 'motion/react';
 import { Lock, Unlock, LogOut, ChevronRight, ArrowUp } from 'lucide-react';
@@ -193,6 +193,19 @@ export default function App() {
         setTexts(txts);
         localStorage.setItem('cache_texts', JSON.stringify(txts));
         localStorage.setItem('portfolio_db_seeded_texts', 'true');
+
+        // Auto-seed missing hero-phrases key in the database if empty or not present yet
+        const hasPhrases = txts.some(t => t.key === 'hero-phrases');
+        if (!hasPhrases) {
+          const phrasesDefault: TextConfig = {
+            id: 'hero-phrases',
+            key: 'hero-phrases',
+            value: "Hi, I'm Mazen. 👋\nI build digital experiences that feel premium.\nI craft bespoke interactive portfolios with fluid visual physics.\nI engineer secure, blazing-fast, and durable full-stack apps.\nI turn complex system requirements into sheer, pixel-perfect design."
+          };
+          setDoc(doc(db, 'texts', 'hero-phrases'), phrasesDefault).catch(err => {
+            console.warn('Unable to auto-seed hero-phrases directly to Firestore:', err);
+          });
+        }
       } else if (localStorage.getItem('portfolio_db_seeded_texts') === 'true') {
         setTexts([]);
         localStorage.removeItem('cache_texts');

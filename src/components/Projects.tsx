@@ -126,6 +126,7 @@ export default function Projects({ projects }: ProjectsProps) {
                       <img
                         src={p.imageUrl}
                         alt={p.title}
+                        loading="lazy"
                         className="object-cover w-full h-full transition-transform duration-700 ease-out group-hover:scale-105"
                         referrerPolicy="no-referrer"
                       />
@@ -236,6 +237,7 @@ export default function Projects({ projects }: ProjectsProps) {
                   <img
                     src={selectedProject.imageUrl}
                     alt={selectedProject.title}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
                   />

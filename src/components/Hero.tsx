@@ -380,6 +380,8 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
               <motion.img 
                 src={heroImage} 
                 alt="Mazen" 
+                fetchPriority="high"
+                loading="eager"
                 animate={{
                   y: [0, -12, 0],
                 }}

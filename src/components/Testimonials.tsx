@@ -45,6 +45,7 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
                   <img
                     src={t.avatar}
                     alt={t.name}
+                    loading="lazy"
                     className="w-9 h-9 rounded-full object-cover border theme-border"
                     referrerPolicy="no-referrer"
                   />

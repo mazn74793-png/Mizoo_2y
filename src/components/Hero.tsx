@@ -61,7 +61,7 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
           setIsDeleting(true);
         }, pauseDuration);
       } else {
-        const typingDelay = Math.random() * 25 + 30; // 30ms - 55ms crisp consistent flow
+        const typingDelay = 40; // Perfect constant high-precision interval (40ms) for an ultra-smooth premium flow
         timer = setTimeout(() => {
           setCurrentText((prev) => fullText.slice(0, prev.length + 1));
         }, typingDelay);
@@ -300,8 +300,8 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
           </span>
         </motion.div>
 
-        {/* Massive displaying headline with elegant live-typewriter story. We use min-height and overflow-visible to completely prevent clipping and layout jumps */}
-        <div className="w-full text-center max-w-4xl min-h-[140px] xs:min-h-[120px] sm:min-h-[180px] md:min-h-[220px] lg:min-h-[265px] flex flex-col justify-center overflow-visible px-2 sm:px-4">
+        {/* Massive displaying headline with elegant live-typewriter story. We lock the height precisely to completely prevent jumping and vertical bouncing on iPhones/Safari */}
+        <div className="w-full text-center max-w-4xl h-[230px] sm:h-[180px] md:h-[220px] lg:h-[265px] flex flex-col justify-center overflow-visible px-2 sm:px-4">
           <motion.h1
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
@@ -379,7 +379,7 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
             >
               <motion.img 
                 src={heroImage} 
-                alt="Motaem" 
+                alt="Mazen" 
                 animate={{
                   y: [0, -12, 0],
                 }}
@@ -406,7 +406,7 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
                   <span className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
                 </div>
                 <div className="text-left font-sans">
-                  <span className="text-xs sm:text-sm font-sans font-medium theme-text-title block">Motaem (Mazen)</span>
+                  <span className="text-xs sm:text-sm font-sans font-medium theme-text-title block">Mazen</span>
                   <span className="text-[9px] sm:text-[10px] font-mono theme-text-desc uppercase tracking-widest block mt-0.5">Creator & Full-Stack Engineer</span>
                 </div>
               </div>

@@ -1747,7 +1747,7 @@ export default function AdminDashboard({
                       {portraitValue ? (
                         <img 
                           src={portraitValue} 
-                          alt="Motaem Cutout Preview" 
+                          alt="Mazen Cutout Preview" 
                           className="w-[94%] md:w-[98%] max-h-[118%] object-contain filter drop-shadow-[0_25px_35px_rgba(0,0,0,0.85)]"
                           referrerPolicy="no-referrer"
                         />

@@ -1,99 +1,41 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import React from 'react';
+import { LayoutDashboard, Menu } from 'lucide-react';
 
 interface NavbarProps {
-  isAdminMode: boolean;
-  setAdminMode: (mode: boolean) => void;
-  activeSection: string;
-  scrollToSection: (id: string) => void;
-  theme: 'light' | 'dark';
-  setTheme: (theme: 'light' | 'dark') => void;
+  isAdminOpen: boolean;
+  setIsAdminOpen: (open: boolean) => void;
 }
 
-export default function Navbar({ isAdminMode, setAdminMode, activeSection, scrollToSection, theme, setTheme }: NavbarProps) {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 30);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
+const Navbar: React.FC<NavbarProps> = ({ isAdminOpen, setIsAdminOpen }) => {
   return (
-    <>
-      <motion.header
-        id="navbar-header"
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          scrolled 
-            ? theme === 'dark'
-              ? 'bg-black/60 border-b border-neutral-900/50 backdrop-blur-md py-4' 
-              : 'bg-white/70 border-b border-neutral-200/50 backdrop-blur-md py-4'
-            : 'bg-transparent py-6'
-        }`}
-      >
-        <div className="w-full max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-          
-          {/* Logo Brand Title */}
-          <div 
-            onClick={() => { setAdminMode(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="flex items-center space-x-2 cursor-pointer group"
-          >
-            <span className={`text-sm font-sans tracking-[0.25em] font-light uppercase transition-colors ${theme === 'dark' ? 'text-white' : 'text-neutral-900'}`}>
-              MAZEN
-            </span>
-            <span className={`w-1.5 h-1.5 rounded-full transition-colors ${theme === 'dark' ? 'bg-white' : 'bg-neutral-900'}`} />
-            <span className="text-[10px] font-mono tracking-widest text-neutral-500 uppercase">
-              ELITE
-            </span>
-          </div>
-
-          {/* Luxury Section Navigation Links */}
-          {!isAdminMode ? (
-            <nav className="hidden md:flex items-center space-x-8">
-              {['work', 'about', 'skills', 'services', 'contact'].map((section) => (
-                <button
-                  key={section}
-                  onClick={() => scrollToSection(section)}
-                  className={`text-xs font-mono tracking-wider uppercase transition-colors relative py-1 cursor-pointer ${
-                    activeSection === section 
-                      ? theme === 'dark' ? 'text-white' : 'text-neutral-900 font-semibold' 
-                      : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-white'
-                  }`}
-                >
-                  {section}
-                  {activeSection === section && (
-                    <motion.span
-                      layoutId="activeIndicator"
-                      className={`absolute bottom-0 left-0 right-0 h-[1.5px] ${theme === 'dark' ? 'bg-white' : 'bg-neutral-900'}`}
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                </button>
-              ))}
-            </nav>
-          ) : (
-            <div className="hidden md:flex items-center space-x-3 text-xs font-mono text-neutral-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>LOGGED IN AS ADMIN CONTROL PANEL</span>
-            </div>
-          )}
-
-          {/* Subtle Right End Anchor representing premium standard */}
-          <div className="flex items-center space-x-4">
-            <span className="text-[9px] font-mono text-neutral-400 dark:text-neutral-600 uppercase tracking-widest hidden sm:inline-block">
-              Premium Digital Spec v2.1
-            </span>
+    <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-7xl">
+      <div className="bg-white/80 backdrop-blur-md border border-neutral-100 px-8 py-4 flex items-center justify-between rounded-full shadow-sm">
+        <div className="flex items-center gap-12">
+          <a href="/" className="text-2xl font-serif tracking-tighter text-[#D4AF37] font-bold">
+            TEX Vibe
+          </a>
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium tracking-wide uppercase text-neutral-500">
+            <a href="#collections" className="hover:text-[#D4AF37] transition-colors">Collections</a>
+            <a href="#wholesale" className="hover:text-[#D4AF37] transition-colors">B2B Wholesale</a>
+            <a href="#about" className="hover:text-[#D4AF37] transition-colors">Heritage</a>
           </div>
         </div>
-      </motion.header>
-    </>
+
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setIsAdminOpen(!isAdminOpen)}
+            className="flex items-center gap-2 px-6 py-2 bg-neutral-900 text-white rounded-full text-xs font-semibold uppercase tracking-widest hover:bg-[#D4AF37] transition-all duration-300 group"
+          >
+            <LayoutDashboard size={14} className="group-hover:rotate-12 transition-transform" />
+            Admin Dashboard
+          </button>
+          <button className="md:hidden p-2 text-neutral-800">
+            <Menu size={20} />
+          </button>
+        </div>
+      </div>
+    </nav>
   );
-}
+};
+
+export default Navbar;

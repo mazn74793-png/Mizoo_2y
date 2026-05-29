@@ -283,8 +283,8 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
         <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[var(--bg-primary)] to-transparent pointer-events-none" />
       </div>
 
-      {/* Hero content - Centered Layout for peak premium aesthetics */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-12 flex flex-col items-center justify-center text-center">
+      {/* Hero content - Left-aligned main content with centered portrait for majestic balanced structure */}
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-12 flex flex-col items-start justify-start text-left">
         
         {/* Tag line with cinematic layout */}
         <motion.div
@@ -301,12 +301,12 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
         </motion.div>
 
         {/* Massive displaying headline with elegant live-typewriter story. We lock the height precisely to completely prevent jumping and vertical bouncing on iPhones/Safari */}
-        <div className="w-full text-center max-w-4xl h-[230px] sm:h-[180px] md:h-[220px] lg:h-[265px] flex flex-col justify-center overflow-visible px-2 sm:px-4">
+        <div className="w-full text-left max-w-4xl h-[230px] sm:h-[180px] md:h-[220px] lg:h-[265px] flex flex-col justify-center overflow-visible px-0 select-none">
           <motion.h1
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-tight leading-[1.12] font-bold text-center italic select-none py-1"
+            className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-tight leading-[1.12] font-bold text-left italic select-none py-1"
           >
             <span className={theme === 'dark' ? 'text-white' : 'text-neutral-950'}>
               {currentText}
@@ -326,7 +326,7 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
-          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto"
+          className="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4 w-full sm:w-auto"
         >
           <motion.button
             whileHover={{ y: -4, scale: 1.02, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
@@ -342,18 +342,18 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
             whileHover={{ y: -3, scale: 1.02, bg: 'rgba(120, 120, 120, 0.05)' }}
             whileTap={{ scale: 0.98 }}
             onClick={() => scrollToSection('contact')}
-            className="text-xs font-mono uppercase tracking-wider py-4.5 px-10 border theme-border theme-text-muted hover:theme-text-title transition-colors rounded-lg w-full sm:w-auto backdrop-blur-sm cursor-pointer"
+            className="text-xs font-mono uppercase tracking-wider py-4.5 px-10 border theme-border theme-text-muted hover:theme-text-title transition-colors rounded-lg w-full sm:w-auto backdrop-blur-sm cursor-pointer text-center"
           >
             Contact Me
           </motion.button>
         </motion.div>
 
-        {/* Center column (Sublime Giant Standalone Transparent 3D Parallax Portrait) */}
+        {/* Center column (Sublime Giant Standalone Transparent 3D Parallax Portrait) - Centered with self-center for balance */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.6 }}
-          className="flex flex-col justify-center items-center w-full relative group/deck mt-16 max-w-xl md:max-w-3xl lg:max-w-4xl overflow-visible"
+          className="self-center flex flex-col justify-center items-center w-full relative group/deck mt-16 max-w-xl md:max-w-3xl lg:max-w-4xl overflow-visible"
         >
           {/* Majestic ambient aura spotlight directly behind the transparent body */}
           <div className="absolute w-[200%] h-[200%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 bg-[radial-gradient(circle_at_center,rgba(52,211,153,0.08)_0%,rgba(120,120,120,0.02)_45%,transparent_80%)] rounded-full blur-[120px] pointer-events-none group-hover/deck:scale-105 transition-transform duration-1000" />

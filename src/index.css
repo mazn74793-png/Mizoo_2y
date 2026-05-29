@@ -1,155 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Plus Jakarta Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --font-display: "Space Grotesk", sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
+  background-color: #FAFAFA;
 }
 
-/* Base custom scrollbars for elite fluid inertia look */
+body {
+  @apply bg-[#FAFAFA] text-neutral-800 font-sans antialiased;
+}
+
+h1, h2, h3, h4, .font-serif {
+  @apply font-serif;
+}
+
+/* Luxury Scroller */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: transparent;
+  @apply bg-[#FAFAFA];
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(120, 120, 120, 0.25);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(16, 185, 129, 0.45);
+  @apply bg-[#D4AF37]/30 rounded-full hover:bg-[#D4AF37]/50 transition-colors;
 }
 
-* {
-  -webkit-tap-highlight-color: transparent !important;
-  outline: none !important;
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
 }
 
-*:focus {
-  outline: none !important;
-  box-shadow: none !important;
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
-@keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-33.333%); }
+.glass-dashboard {
+  @apply bg-white/70 backdrop-blur-xl border-l border-white/20 shadow-2xl;
 }
-
-@keyframes marquee-reverse {
-  0% { transform: translateX(-33.333%); }
-  100% { transform: translateX(0); }
-}
-
-.animate-marquee {
-  display: flex;
-  width: max-content;
-  animation: marquee 35s linear infinite;
-}
-
-.animate-marquee-reverse {
-  display: flex;
-  width: max-content;
-  animation: marquee-reverse 35s linear infinite;
-}
-
-.marquee-container {
-  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
-}
-
-/* High-contrast Alabaster Light & Cosmic Dark variables */
-:root {
-  --bg-primary: #050505;
-  --bg-secondary: #0d0d0d;
-  --bg-card: rgba(13, 13, 13, 0.45);
-  --bg-card-hover: rgba(20, 20, 20, 0.6);
-  --border-color: #1a1a1a;
-  --text-primary: #ffffff;
-  --text-secondary: #a3a3a3;
-  --text-muted: #525252;
-}
-
-.light {
-  --bg-primary: #fbfbfa; /* Warm Alabaster */
-  --bg-secondary: #f4f4f0; /* Soft Clay Gray */
-  --bg-card: #ffffff; /* Beautiful White Card */
-  --bg-card-hover: #fcfcf9;
-  --border-color: #deded6; /* Soft subtle light grid border */
-  --text-primary: #151515; /* Luxurious charcoal black */
-  --text-secondary: #555550; /* High legibility dark gray */
-  --text-muted: #8c8c82; /* Muted gray specs */
-}
-
-/* Luxury Theme transition utilities */
-.theme-bg-page {
-  background-color: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
-  transition: background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.theme-bg-sec {
-  background-color: var(--bg-secondary) !important;
-  transition: background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.theme-card {
-  background-color: var(--bg-card) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-primary) !important;
-  transition: background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), 
-              border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), 
-              color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.12s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.12s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.theme-card:hover {
-  background-color: var(--bg-card-hover) !important;
-  border-color: var(--border-color) !important;
-}
-
-.theme-border {
-  border-color: var(--border-color) !important;
-  transition: border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.theme-text-title {
-  color: var(--text-primary) !important;
-  transition: color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.theme-text-desc {
-  color: var(--text-secondary) !important;
-  transition: color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.theme-text-muted {
-  color: var(--text-muted) !important;
-  transition: color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.interactive-card {
-  will-change: transform, box-shadow;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-.interactive-card:hover {
-  transform: translateY(-5px) scale(1.006) !important;
-  box-shadow: 0 16px 36px -12px rgba(0,0,0,0.18), 0 0 0 1.5px rgba(255, 255, 255, 0.12) !important;
-}
-
-.light .interactive-card:hover {
-  box-shadow: 0 16px 36px -12px rgba(0,0,0,0.06), 0 0 0 1.5px rgba(0, 0, 0, 0.08) !important;
-}
-
-
-
-

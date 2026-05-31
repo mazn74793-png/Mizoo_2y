@@ -92,10 +92,13 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
       color: string;
     }> = [];
 
+    const isMobileDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth < 768);
+
     // Create a beautifully sparse set of luxury monochrome particles
     const initParticles = () => {
       particles.length = 0;
-      const count = Math.min(Math.floor(width / 24), 80);
+      // High-performance particle count gating: limit connection calculation overhead on mobile hardware
+      const count = isMobileDevice ? 16 : Math.min(Math.floor(width / 24), 80);
       for (let i = 0; i < count; i++) {
         particles.push({
           x: Math.random() * width,
@@ -114,6 +117,7 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
     let mouse = { x: -1000, y: -1000 };
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (isMobileDevice) return;
       const rect = canvas.getBoundingClientRect();
       mouse.x = e.clientX - rect.left;
       mouse.y = e.clientY - rect.top;
@@ -124,8 +128,10 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
       mouse.y = -1000;
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('mouseleave', handleMouseLeave);
+    if (!isMobileDevice) {
+      window.addEventListener('mousemove', handleMouseMove, { passive: true });
+      canvas.addEventListener('mouseleave', handleMouseLeave);
+    }
 
     const resizeObserver = new ResizeObserver((entries) => {
       for (let entry of entries) {
@@ -162,8 +168,8 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
         ctx.stroke();
       }
 
-      // Draw mouse ambient spotlight glow
-      if (mouse.x > -1000) {
+      // Draw mouse ambient spotlight glow (Bypass entirely on touch screens)
+      if (!isMobileDevice && mouse.x > -1000) {
         const gradient = ctx.createRadialGradient(
           mouse.x,
           mouse.y,
@@ -189,8 +195,8 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
         if (p.x < 0 || p.x > width) p.vx *= -1;
         if (p.y < 0 || p.y > height) p.vy *= -1;
 
-        // Smooth gravity pull towards mouse coordinates
-        if (mouse.x > -1000) {
+        // Smooth gravity pull towards mouse coordinates (Bypass on mobile)
+        if (!isMobileDevice && mouse.x > -1000) {
           const dx = mouse.x - p.x;
           const dy = mouse.y - p.y;
           const dist = Math.hypot(dx, dy);
@@ -208,22 +214,24 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
         ctx.fill();
       }
 
-      // Draw premium connection networks
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.hypot(dx, dy);
-          if (dist < 110) {
-            const alpha = ((110 - dist) / 110) * 0.15;
-            ctx.strokeStyle = theme === 'dark' 
-              ? `rgba(255, 255, 255, ${alpha * 0.65})` 
-              : `rgba(16, 185, 129, ${alpha * 0.75})`;
-            ctx.lineWidth = 0.5;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
+      // Draw premium connection networks (Strictly bypass CPU-bound double-loop on mobile browsers for flawless 120fps scrolling)
+      if (!isMobileDevice) {
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < 110) {
+              const alpha = ((110 - dist) / 110) * 0.15;
+              ctx.strokeStyle = theme === 'dark' 
+                ? `rgba(255, 255, 255, ${alpha * 0.65})` 
+                : `rgba(16, 185, 129, ${alpha * 0.75})`;
+              ctx.lineWidth = 0.5;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
           }
         }
       }
@@ -236,9 +244,11 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
 
     return () => {
       cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (canvas) {
-        canvas.removeEventListener('mouseleave', handleMouseLeave);
+      if (!isMobileDevice) {
+        window.removeEventListener('mousemove', handleMouseMove);
+        if (canvas) {
+          canvas.removeEventListener('mouseleave', handleMouseLeave);
+        }
       }
       resizeObserver.disconnect();
     };

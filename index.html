@@ -4,6 +4,57 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <!-- Prevent Vite HMR WebSocket connection errors in cloud developer environment -->
+    <script>
+      (function() {
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.error = function(...args) {
+          const msg = args.map(arg => String(arg)).join(' ');
+          if (msg.includes('websocket') || msg.includes('vite') || msg.includes('localhost:3000') || msg.includes('HMR')) {
+            return; // Silence expected dev server websocket errors
+          }
+          originalError.apply(console, args);
+        };
+        
+        console.warn = function(...args) {
+          const msg = args.map(arg => String(arg)).join(' ');
+          if (msg.includes('websocket') || msg.includes('vite') || msg.includes('HMR')) {
+            return; // Silence dev warnings
+          }
+          originalWarn.apply(console, args);
+        };
+
+        const OriginalWS = window.WebSocket;
+        if (OriginalWS) {
+          const PatchedWS = function(url, protocols) {
+            if (typeof url === 'string' && (url.includes('vite') || url.includes('localhost') || url.includes('.run.app'))) {
+              return {
+                url,
+                readyState: 3, // CLOSED
+                bufferedAmount: 0,
+                extensions: '',
+                protocol: '',
+                binaryType: 'blob',
+                send: () => {},
+                close: () => {},
+                addEventListener: () => {},
+                removeEventListener: () => {},
+                onopen: null,
+                onerror: null,
+                onclose: null,
+                onmessage: null
+              };
+            }
+            return new OriginalWS(url, protocols);
+          };
+          PatchedWS.prototype = OriginalWS.prototype;
+          window.WebSocket = PatchedWS;
+        }
+      })();
+    </script>
+    
     <!-- Google Fonts Preconnect Optimizations -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

@@ -51,17 +51,17 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
       } else {
         timer = setTimeout(() => {
           setCurrentText((prev) => prev.slice(0, -1));
-        }, 15); // Faster backspace rhythm for responsive elite feedback
+        }, 10); // Ultra-fast and snappy deleting rhythm
       }
     } else {
       if (currentText === fullText) {
         const isGreeting = fullText.startsWith("Hi, I'm") || fullText.startsWith("Hi,") || fullText.length < 20;
-        const pauseDuration = isGreeting ? 2000 : 3200; // Pause less on the intro greeting for snap flow
+        const pauseDuration = isGreeting ? 1500 : 2500; // Perfect pause length before transitioning
         timer = setTimeout(() => {
           setIsDeleting(true);
         }, pauseDuration);
       } else {
-        const typingDelay = 40; // Perfect constant high-precision interval (40ms) for an ultra-smooth premium flow
+        const typingDelay = 25; // Super snappy high-performance 25ms interval for elite smooth feeling
         timer = setTimeout(() => {
           setCurrentText((prev) => fullText.slice(0, prev.length + 1));
         }, typingDelay);
@@ -274,12 +274,6 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
     setTilt({ x: 0, y: 0 });
   };
 
-  const [tick, setTick] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setTick((p) => p + 1), 1000);
-    return () => clearInterval(t);
-  }, []);
-
   return (
     <section 
       id="hero-section"
@@ -311,25 +305,21 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
         </motion.div>
 
         {/* Massive displaying headline with elegant live-typewriter story. We lock the height precisely to completely prevent jumping and vertical bouncing on iPhones/Safari */}
-        <div className="w-full text-left max-w-4xl h-[230px] sm:h-[180px] md:h-[220px] lg:h-[265px] flex flex-col justify-center overflow-visible px-0 select-none">
-          <motion.h1
-            initial={{ opacity: 0, y: 25 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-tight leading-[1.12] font-bold text-left italic select-none py-1"
-          >
+        <motion.div
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+          className="w-full text-left max-w-4xl h-[230px] sm:h-[180px] md:h-[220px] lg:h-[265px] flex flex-col justify-center overflow-visible px-0 select-none"
+        >
+          <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-tight leading-[1.12] font-bold text-left italic select-none py-1">
             <span className={theme === 'dark' ? 'text-white' : 'text-neutral-950'}>
               {currentText}
             </span>
             <span className="inline-block relative ml-2">
-              <motion.span
-                animate={{ opacity: [1, 0, 1] }}
-                transition={{ duration: 0.9, repeat: Infinity, ease: 'easeInOut' }}
-                className="inline-block w-1.5 md:w-2 h-7 sm:h-11 md:h-14 lg:h-16 xl:h-20 bg-emerald-500 rounded-sm shadow-[0_0_15px_rgba(16,185,129,0.7)]"
-              />
+              <span className="inline-block w-1.5 md:w-2 h-7 sm:h-11 md:h-14 lg:h-16 xl:h-20 bg-emerald-500 rounded-sm shadow-[0_0_15px_rgba(16,185,129,0.7)] animate-pulse" />
             </span>
-          </motion.h1>
-        </div>
+          </h1>
+        </motion.div>
 
         {/* Buttons and actions */}
         <motion.div

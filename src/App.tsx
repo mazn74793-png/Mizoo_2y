@@ -50,30 +50,48 @@ export default function App() {
     }
   };
 
-  const handlePasscodeSubmit = (e: FormEvent) => {
+  const handlePasscodeSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const cleanPass = passcode.trim().toLowerCase();
-    const validPasscodes = [
-      'mazen23@admin',
-      'motaem23y@gmail.com',
-      'motaem23@gmail.com'
-    ];
-    if (validPasscodes.includes(cleanPass)) {
-      const mockUser = {
-        uid: 'mazen-bypass-uid',
-        email: 'motaem23y@gmail.com',
-        displayName: 'Mazen Elite Bypass',
-        emailVerified: true,
-        isAnonymous: false,
-        providerData: []
-      } as any;
-      setCurrentUser(mockUser);
-      setAdminMode(true);
-      setIsAuthOpen(false);
-      setPasscode('');
-      setAuthError('');
-    } else {
-      setAuthError('رمز المرور غير صحيح أو غير مصرح به. يرجى إدخال مفاصل الأمان الصحيحة.');
+    try {
+      const cleanPass = passcode.trim().toLowerCase();
+      
+      // Hash using native browser-side crypto SubtleCrypto SHA-256
+      const msgBuffer = new TextEncoder().encode(cleanPass);
+      const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      const validHashes = [
+        'f8614e5dc45a9376b27e8734b41b67a185444b2c1bbe1cbb83c38217ecc0a580', // mazen23@admin
+        'ef1afe13a2bd786629356f83b936c78cccc3683ee172ccd9d78780da63578405', // motaem23y@gmail.com
+        '0a181d1436cfb77d600affbe036a28f7d7cb1e5c84ae478bf0a8f0c1a63db727'  // motaem23@gmail.com
+      ];
+
+      if (validHashes.includes(hashHex)) {
+        const matchedEmail = hashHex === '0a181d1436cfb77d600affbe036a28f7d7cb1e5c84ae478bf0a8f0c1a63db727' 
+          ? 'motaem23@gmail.com' 
+          : 'motaem23y@gmail.com';
+
+        const mockUser = {
+          uid: 'mazen-bypass-uid',
+          email: matchedEmail,
+          displayName: 'Mazen Elite Bypass',
+          emailVerified: true,
+          isAnonymous: false,
+          providerData: []
+        } as any;
+        localStorage.setItem('admin_passcode_hash', hashHex);
+        setCurrentUser(mockUser);
+        setAdminMode(true);
+        setIsAuthOpen(false);
+        setPasscode('');
+        setAuthError('');
+      } else {
+        setAuthError('رمز المرور غير صحيح أو غير مصرح به. يرجى إدخال مفاصل الأمان الصحيحة.');
+      }
+    } catch (err) {
+      console.error(err);
+      setAuthError('حدث خطأ أثناء معالجة تشفير رمز المرور.');
     }
   };
 
@@ -487,7 +505,6 @@ export default function App() {
                     >
                       تسجيل دخول فوري
                     </button>
-                    <p className="text-[9px] text-neutral-500 font-mono text-center mt-1">تنويه: يمكنك استخدام رمز المرور الجديد "mazen23@admin" كبديل آمن وسريع</p>
                   </form>
                 </div>
               )}

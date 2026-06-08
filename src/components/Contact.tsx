@@ -116,31 +116,23 @@ export default function Contact({ socials, isAdminMode, setAdminMode, currentUse
         </div>
 
         {/* Absolute Footer line credit - Literal, human labels per anti-ai-slop guidelines */}
-        <div className="border-t theme-border mt-24 md:mt-32 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-[10px] font-mono theme-text-muted uppercase tracking-widest">
+        <div className="border-t theme-border mt-24 md:mt-32 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 select-none">
+          <p 
+            onDoubleClick={() => {
+              if (currentUser && isMazen) {
+                setAdminMode(!isAdminMode);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              } else {
+                setIsAuthOpen(true);
+              }
+            }}
+            className="text-[10px] font-mono theme-text-muted uppercase tracking-widest cursor-default select-none active:text-neutral-900 dark:active:text-neutral-100 transition-colors"
+          >
             © {new Date().getFullYear()} MAZEN. ALL DESIGN PRINCIPLES INSPIRED BY APPLE & STRIPE.
           </p>
-          <div className="flex items-center space-x-6 text-[10px] font-mono theme-text-muted uppercase tracking-widest">
+          <div className="flex items-center space-x-6 text-[10px] font-mono theme-text-muted uppercase tracking-widest select-none">
             <span className="hover:text-neutral-900 dark:hover:text-neutral-100 cursor-pointer transition-colors">Security Spec</span>
             <span className="hover:text-neutral-900 dark:hover:text-neutral-100 cursor-pointer transition-colors">Clean Systems</span>
-            <button
-              onClick={() => {
-                if (currentUser && isMazen) {
-                  setAdminMode(!isAdminMode);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
-                  setIsAuthOpen(true);
-                }
-              }}
-              className="hover:text-neutral-900 dark:hover:text-neutral-100 focus:text-neutral-900 dark:focus:text-neutral-100 cursor-pointer transition-colors border-none p-0 bg-transparent uppercase font-mono tracking-widest flex items-center space-x-1.5 focus:outline-none"
-            >
-              <span>[ System Portal ]</span>
-              {currentUser && isMazen ? (
-                <span className="w-1.5 h-1.5 rounded-full bg-neutral-900 dark:bg-white animate-pulse" />
-              ) : (
-                <span className="w-1.5 h-1.5 rounded-full bg-neutral-600 dark:bg-neutral-500" />
-              )}
-            </button>
           </div>
         </div>
       </div>

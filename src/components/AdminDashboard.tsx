@@ -114,47 +114,50 @@ export default function AdminDashboard({
     setIsSeeding(true);
     setSeedStep('جاري تشفير تهيئة الاتصال بقاعدة البيانات...');
     try {
+      const activeHash = localStorage.getItem('admin_passcode_hash') || '';
+
       // 1. Seed Projects
       setSeedStep('جاري شحن المشاريع الافتراضية (Projects)...');
       for (const p of DEFAULT_PROJECTS) {
-        await setDoc(doc(db, 'projects', p.id), p);
+        await setDoc(doc(db, 'projects', p.id), { ...p, adminHash: activeHash });
       }
 
       // 2. Seed Skills
       setSeedStep('جاري شحن المهارات (Skills Grid)...');
       for (const s of DEFAULT_SKILLS) {
-        await setDoc(doc(db, 'skills', s.id), s);
+        await setDoc(doc(db, 'skills', s.id), { ...s, adminHash: activeHash });
       }
 
       // 3. Seed Services
       setSeedStep('جاري شحن خدمات البورتفوليو (Services)...');
       for (const s of DEFAULT_SERVICES) {
-        await setDoc(doc(db, 'services', s.id), s);
+        await setDoc(doc(db, 'services', s.id), { ...s, adminHash: activeHash });
       }
 
       // 4. Seed Testimonials
       setSeedStep('جاري شحن شهادات العملاء والشركاء (Co-signs)...');
       for (const t of DEFAULT_TESTIMONIALS) {
-        await setDoc(doc(db, 'testimonials', t.id), t);
+        await setDoc(doc(db, 'testimonials', t.id), { ...t, adminHash: activeHash });
       }
 
       // 5. Seed Socials
       setSeedStep('جاري شحن روابط التواصل الاجتماعي (Socials)...');
       for (const s of DEFAULT_SOCIALS) {
-        await setDoc(doc(db, 'socialLinks', s.id), s);
+        await setDoc(doc(db, 'socialLinks', s.id), { ...s, adminHash: activeHash });
       }
 
       // 6. Seed Texts
       setSeedStep('جاري شحن نصوص واجهة المستخدم (UI Copy)...');
       for (const t of DEFAULT_TEXTS) {
-        await setDoc(doc(db, 'texts', t.id), t);
+        await setDoc(doc(db, 'texts', t.id), { ...t, adminHash: activeHash });
       }
       
       // Also write default hero-image key to texts
       await setDoc(doc(db, 'texts', 'text-hero-image'), {
         id: 'text-hero-image',
         key: 'hero-image',
-        value: '/src/assets/images/motaem_cutout_1779628899218.png'
+        value: '/src/assets/images/motaem_cutout_1779628899218.png',
+        adminHash: activeHash
       });
 
       // Set localStorage seed flag
@@ -388,28 +391,45 @@ export default function AdminDashboard({
     }
   };
 
-  const handleAdminPasscodeSubmit = (e: React.FormEvent) => {
+  const handleAdminPasscodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanPass = adminPasscode.trim().toLowerCase();
-    const validPasscodes = [
-      'mazen23@admin',
-      'motaem23y@gmail.com',
-      'motaem23@gmail.com'
-    ];
-    if (validPasscodes.includes(cleanPass)) {
-      const mockUser = {
-        uid: 'mazen-bypass-uid',
-        email: 'motaem23y@gmail.com',
-        displayName: 'Mazen Elite Bypass',
-        emailVerified: true,
-        isAnonymous: false,
-        providerData: []
-      } as any;
-      setCurrentUser(mockUser);
-      setAdminPasscode('');
-      setAdminAuthError('');
-    } else {
-      setAdminAuthError('رمز المرور غير صحيح أو غير مصرح به. يرجى استخدام الرمز الصحيح.');
+    try {
+      const cleanPass = adminPasscode.trim().toLowerCase();
+      
+      const msgBuffer = new TextEncoder().encode(cleanPass);
+      const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+      const validHashes = [
+        'f8614e5dc45a9376b27e8734b41b67a185444b2c1bbe1cbb83c38217ecc0a580', // mazen23@admin
+         'ef1afe13a2bd786629356f83b936c78cccc3683ee172ccd9d78780da63578405', // motaem23y@gmail.com
+         '0a181d1436cfb77d600affbe036a28f7d7cb1e5c84ae478bf0a8f0c1a63db727'  // motaem23@gmail.com
+      ];
+
+      if (validHashes.includes(hashHex)) {
+        const matchedEmail = hashHex === '0a181d1436cfb77d600affbe036a28f7d7cb1e5c84ae478bf0a8f0c1a63db727' 
+          ? 'motaem23@gmail.com' 
+          : 'motaem23y@gmail.com';
+
+        const mockUser = {
+          uid: 'mazen-bypass-uid',
+          email: matchedEmail,
+          displayName: 'Mazen Elite Bypass',
+          emailVerified: true,
+          isAnonymous: false,
+          providerData: []
+        } as any;
+        localStorage.setItem('admin_passcode_hash', hashHex);
+        setCurrentUser(mockUser);
+        setAdminPasscode('');
+        setAdminAuthError('');
+      } else {
+        setAdminAuthError('رمز المرور غير صحيح أو غير مصرح به. يرجى استخدام الرمز الصحيح.');
+      }
+    } catch (err) {
+      console.error(err);
+      setAdminAuthError('حدث خطأ أثناء معالجة تشفير رمز المرور.');
     }
   };
 
@@ -509,7 +529,6 @@ export default function AdminDashboard({
               >
                 دخول فوري كمسؤول النظام
               </button>
-              <p className="text-[9px] text-neutral-500 font-mono text-center">تنويه (للمعاينة): يمكنك استخدام رمز المرور الجديد "mazen23@admin" كبديل آمن وسريع</p>
             </form>
 
             {setAdminMode && (
@@ -738,7 +757,10 @@ export default function AdminDashboard({
         };
       }
 
-      await setDoc(doc(db, payloadName, id), payload);
+      const activeHash = localStorage.getItem('admin_passcode_hash') || '';
+      const finalPayload = { ...payload, adminHash: activeHash };
+
+      await setDoc(doc(db, payloadName, id), finalPayload);
       setIsFormOpen(false);
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, `${payloadName}/${id}`);
@@ -1712,10 +1734,12 @@ export default function AdminDashboard({
                           return;
                         }
                         try {
+                          const activeHash = localStorage.getItem('admin_passcode_hash') || '';
                           await setDoc(doc(db, 'texts', 'text-hero-image'), {
                             id: 'text-hero-image',
                             key: 'hero-image',
-                            value: portraitValue
+                            value: portraitValue,
+                            adminHash: activeHash
                           });
                           alert('تم حفظ الصورة بنجاح وتحديث الهيرو مباشرة! 🎉');
                         } catch (err) {

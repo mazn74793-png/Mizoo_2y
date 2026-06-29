@@ -67,17 +67,17 @@ export default function Contact({ socials, isAdminMode, setAdminMode, currentUse
             <div className="pt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <a
                 href="mailto:motaem23@gmail.com"
-                className="text-xs font-mono uppercase tracking-wider bg-neutral-900 dark:bg-white text-white dark:text-black hover:opacity-90 px-6 py-4.5 rounded font-semibold transition-all inline-block text-center w-full sm:w-auto shadow-md"
+                className="text-xs font-mono uppercase tracking-wider bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-4.5 rounded font-bold transition-all inline-block text-center w-full sm:w-auto shadow-md"
               >
                 Let’s Collaborate
               </a>
               
               <button
                 onClick={handleCopyEmail}
-                className="flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white hover:bg-neutral-950/5 dark:hover:bg-white/5 border border-neutral-350 dark:border-neutral-700 hover:border-neutral-900 dark:hover:border-white px-6 py-4.5 rounded transition-all w-full sm:w-auto cursor-pointer font-semibold"
+                className="flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider text-neutral-800 hover:text-emerald-500 hover:border-emerald-500 hover:bg-emerald-50/10 border border-neutral-350 px-6 py-4.5 rounded transition-all w-full sm:w-auto cursor-pointer font-semibold"
               >
-                {copied ? <Check className="w-4 h-4 text-neutral-900 dark:text-neutral-150" /> : <Mail className="w-4 h-4" />}
-                <span>{copied ? 'Copied Secure' : 'Copy Email'}</span>
+                {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Mail className="w-4 h-4" />}
+                <span className={copied ? "text-emerald-600 font-semibold" : ""}>{copied ? 'Copied Secure' : 'Copy Email'}</span>
               </button>
             </div>
           </div>

@@ -304,19 +304,19 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
           </span>
         </motion.div>
 
-        {/* Massive displaying headline with elegant live-typewriter story. We lock the height precisely to completely prevent jumping and vertical bouncing on iPhones/Safari */}
+        {/* Massive displaying headline with elegant live-typewriter story. We use min-height with responsive text scaling to support long phrases gracefully on all laptop/mobile dimensions without overlapping the buttons */}
         <motion.div
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-          className="w-full text-left max-w-4xl h-[230px] sm:h-[180px] md:h-[220px] lg:h-[265px] flex flex-col justify-center overflow-visible px-0 select-none"
+          className="w-full text-left max-w-4xl min-h-[220px] xs:min-h-[190px] sm:min-h-[140px] md:min-h-[150px] lg:min-h-[185px] xl:min-h-[200px] flex flex-col justify-center overflow-visible px-0 select-none"
         >
-          <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-tight leading-[1.12] font-bold text-left italic select-none py-1">
+          <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl tracking-tight leading-[1.12] font-bold text-left italic select-none py-1">
             <span className={theme === 'dark' ? 'text-white' : 'text-neutral-950'}>
               {currentText}
             </span>
             <span className="inline-block relative ml-2">
-              <span className="inline-block w-1.5 md:w-2 h-7 sm:h-11 md:h-14 lg:h-16 xl:h-20 bg-emerald-500 rounded-sm shadow-[0_0_15px_rgba(16,185,129,0.7)] animate-pulse" />
+              <span className="inline-block w-1 md:w-1.5 h-7 sm:h-9 md:h-11 lg:h-13 xl:h-16 bg-emerald-500 rounded-sm shadow-[0_0_15px_rgba(16,185,129,0.7)] animate-pulse" />
             </span>
           </h1>
         </motion.div>
@@ -326,23 +326,23 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
-          className="mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4 w-full sm:w-auto"
+          className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-start gap-4 w-full sm:w-auto"
         >
           <motion.button
             whileHover={{ y: -4, scale: 1.02, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
             whileTap={{ scale: 0.98 }}
             onClick={() => scrollToSection('work')}
-            className="group relative interactive-card flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider py-4.5 px-10 bg-neutral-900 dark:bg-white text-white dark:text-black rounded-lg w-full sm:w-auto shadow-xl cursor-pointer font-medium border border-transparent dark:border-neutral-150/10"
+            className="group relative flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider py-4.5 px-10 bg-neutral-950 dark:bg-white text-white dark:text-black rounded-lg w-full sm:w-auto shadow-lg cursor-pointer font-semibold border border-transparent dark:border-neutral-200/10 transition-shadow"
           >
             <span>View Work</span>
             <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </motion.button>
           
           <motion.button
-            whileHover={{ y: -3, scale: 1.02, backgroundColor: 'rgba(0, 0, 0, 0.04)' }}
+            whileHover={{ y: -4, scale: 1.02, backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)' }}
             whileTap={{ scale: 0.98 }}
             onClick={() => scrollToSection('contact')}
-            className="text-xs font-mono uppercase tracking-wider py-4.5 px-10 border border-neutral-400 text-neutral-800 hover:text-black hover:border-black transition-colors rounded-lg w-full sm:w-auto backdrop-blur-sm cursor-pointer text-center font-medium"
+            className="text-xs font-mono uppercase tracking-wider py-4.5 px-10 border border-neutral-350 dark:border-neutral-700 text-neutral-800 dark:text-neutral-200 hover:text-neutral-950 dark:hover:text-white hover:border-neutral-900 dark:hover:border-white transition-all rounded-lg w-full sm:w-auto backdrop-blur-sm cursor-pointer text-center font-semibold"
           >
             Contact Me
           </motion.button>

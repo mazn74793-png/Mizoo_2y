@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
+import { Sun, Moon } from 'lucide-react';
 
 interface NavbarProps {
   isAdminMode: boolean;
@@ -91,6 +92,20 @@ export default function Navbar({ isAdminMode, setAdminMode, activeSection, scrol
             <span className="text-[9px] font-mono text-neutral-400 dark:text-neutral-600 uppercase tracking-widest hidden sm:inline-block">
               Premium Digital Spec v2.1
             </span>
+            
+            {/* Highly tactile light/dark theme switch */}
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
+                theme === 'dark'
+                  ? 'border-neutral-800 bg-neutral-900 text-yellow-400 hover:bg-neutral-850 hover:text-yellow-300'
+                  : 'border-neutral-250 bg-white text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 shadow-sm'
+              }`}
+              aria-label="Toggle visual theme"
+              title="Toggle theme"
+            >
+              {theme === 'dark' ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
+            </button>
           </div>
         </div>
       </motion.header>

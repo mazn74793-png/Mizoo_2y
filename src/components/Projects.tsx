@@ -17,6 +17,8 @@ export default function Projects({ projects }: ProjectsProps) {
   // Smoothly scroll and center the content when state transitions occur
   const handleSelectProject = (p: Project) => {
     setSelectedProject(p);
+    // Push history state to enable back button/swipe back navigation
+    window.history.pushState({ view: 'project', id: p.id }, '', `#project-${p.id}`);
     setTimeout(() => {
       const el = document.getElementById('work');
       if (el) {
@@ -26,14 +28,62 @@ export default function Projects({ projects }: ProjectsProps) {
   };
 
   const handleBack = () => {
-    setSelectedProject(null);
-    setTimeout(() => {
-      const el = document.getElementById('work');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 60);
+    if (window.history.state?.view === 'project') {
+      window.history.back();
+    } else {
+      setSelectedProject(null);
+      // Replace hash to clean url cleanly
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      setTimeout(() => {
+        const el = document.getElementById('work');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 60);
+    }
   };
+
+  // Support native back button/gesture on mobile and laptop
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.view === 'project') {
+        const proj = projects.find(p => p.id === event.state.id);
+        if (proj) {
+          setSelectedProject(proj);
+          setTimeout(() => {
+            const el = document.getElementById('work');
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 60);
+        }
+      } else {
+        setSelectedProject(null);
+        setTimeout(() => {
+          const el = document.getElementById('work');
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 60);
+      }
+    };
+
+    // Deep link handling on first mount/load
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#project-')) {
+      const id = hash.replace('#project-', '');
+      const proj = projects.find(p => p.id === id);
+      if (proj) {
+        setSelectedProject(proj);
+        window.history.replaceState({ view: 'project', id: proj.id }, '', hash);
+      }
+    }
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [projects]);
 
   const handleScroll = () => {
     if (sliderRef.current) {
@@ -110,8 +160,8 @@ export default function Projects({ projects }: ProjectsProps) {
                       disabled={!canScrollLeft}
                       className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
                         canScrollLeft
-                          ? 'border-neutral-850 text-neutral-900 bg-white hover:bg-neutral-950 hover:text-white cursor-pointer active:scale-95 shadow-sm'
-                          : 'border-neutral-200 text-neutral-300 opacity-40 cursor-not-allowed'
+                          ? 'border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 hover:bg-neutral-950 hover:text-white dark:hover:bg-white dark:hover:text-black cursor-pointer active:scale-95 shadow-sm'
+                          : 'border-neutral-200 dark:border-neutral-800 text-neutral-300 dark:text-neutral-700 opacity-30 cursor-not-allowed'
                       }`}
                       aria-label="Scroll left"
                     >
@@ -122,8 +172,8 @@ export default function Projects({ projects }: ProjectsProps) {
                       disabled={!canScrollRight}
                       className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
                         canScrollRight
-                          ? 'border-neutral-850 text-neutral-900 bg-white hover:bg-neutral-950 hover:text-white cursor-pointer active:scale-95 shadow-sm'
-                          : 'border-neutral-200 text-neutral-300 opacity-40 cursor-not-allowed'
+                          ? 'border-neutral-300 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100 bg-white dark:bg-neutral-900 hover:bg-neutral-950 hover:text-white dark:hover:bg-white dark:hover:text-black cursor-pointer active:scale-95 shadow-sm'
+                          : 'border-neutral-200 dark:border-neutral-800 text-neutral-300 dark:text-neutral-700 opacity-30 cursor-not-allowed'
                       }`}
                       aria-label="Scroll right"
                     >
@@ -282,7 +332,7 @@ export default function Projects({ projects }: ProjectsProps) {
                       href={selectedProject.githubUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex-1 md:flex-none inline-flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider py-3.5 px-6 bg-white hover:bg-neutral-950 hover:text-white border border-neutral-300 hover:border-neutral-950 transition-all rounded-xl shadow-sm hover:shadow-md text-neutral-800 font-semibold"
+                      className="flex-1 md:flex-none inline-flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider py-3.5 px-6 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-950 dark:hover:bg-white hover:text-white dark:hover:text-black border border-neutral-300 dark:border-neutral-700 hover:border-neutral-950 dark:hover:border-white transition-all rounded-xl shadow-sm hover:shadow-md font-semibold cursor-pointer"
                     >
                       <Github className="w-4 h-4" />
                       <span>Code Source</span>
@@ -293,7 +343,7 @@ export default function Projects({ projects }: ProjectsProps) {
                       href={selectedProject.liveUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex-1 md:flex-none inline-flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider py-3.5 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-all rounded-xl shadow-md hover:shadow-emerald-500/20"
+                      className="flex-1 md:flex-none inline-flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider py-3.5 px-6 bg-emerald-500 hover:bg-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-semibold transition-all rounded-xl shadow-md hover:shadow-lg hover:shadow-emerald-500/20 dark:hover:shadow-emerald-500/10 cursor-pointer"
                     >
                       <ExternalLink className="w-4 h-4 text-white" />
                       <span>Launch App</span>
@@ -356,7 +406,7 @@ export default function Projects({ projects }: ProjectsProps) {
               <div className="pt-12 border-t theme-border flex justify-center">
                 <button
                   onClick={handleBack}
-                  className="inline-flex items-center justify-center space-x-2 px-6 py-4 rounded-xl bg-white hover:bg-neutral-950 hover:text-white border border-neutral-300 hover:border-neutral-950 transition-all text-xs font-mono uppercase tracking-widest text-neutral-800 font-semibold active:scale-95 cursor-pointer shadow-sm hover:shadow-md"
+                  className="inline-flex items-center justify-center space-x-2 px-6 py-4 rounded-xl bg-white dark:bg-neutral-900 hover:bg-neutral-950 dark:hover:bg-white hover:text-white dark:hover:text-black border border-neutral-300 dark:border-neutral-700 hover:border-neutral-950 dark:hover:border-white transition-all text-xs font-mono uppercase tracking-widest text-neutral-800 dark:text-neutral-200 font-semibold active:scale-95 cursor-pointer shadow-sm hover:shadow-md"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   <span>الرجوع للمتصفح / Return to Projects List</span>

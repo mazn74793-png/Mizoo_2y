@@ -108,26 +108,26 @@ export default function Projects({ projects }: ProjectsProps) {
                     <button
                       onClick={() => scroll('left')}
                       disabled={!canScrollLeft}
-                      className={`w-10 h-10 rounded-full border theme-border flex items-center justify-center transition-all ${
+                      className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
                         canScrollLeft
-                          ? 'theme-bg-sec theme-text-title hover:border-emerald-500/50 cursor-pointer active:scale-95'
-                          : 'opacity-30 cursor-not-allowed'
+                          ? 'border-neutral-850 text-neutral-900 bg-white hover:bg-neutral-950 hover:text-white cursor-pointer active:scale-95 shadow-sm'
+                          : 'border-neutral-200 text-neutral-300 opacity-40 cursor-not-allowed'
                       }`}
                       aria-label="Scroll left"
                     >
-                      <ChevronLeft className="w-5 h-5 text-neutral-800 dark:text-neutral-200" />
+                      <ChevronLeft className="w-5 h-5" />
                     </button>
                     <button
                       onClick={() => scroll('right')}
                       disabled={!canScrollRight}
-                      className={`w-10 h-10 rounded-full border theme-border flex items-center justify-center transition-all ${
+                      className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
                         canScrollRight
-                          ? 'theme-bg-sec theme-text-title hover:border-emerald-500/50 cursor-pointer active:scale-95'
-                          : 'opacity-30 cursor-not-allowed'
+                          ? 'border-neutral-850 text-neutral-900 bg-white hover:bg-neutral-950 hover:text-white cursor-pointer active:scale-95 shadow-sm'
+                          : 'border-neutral-200 text-neutral-300 opacity-40 cursor-not-allowed'
                       }`}
                       aria-label="Scroll right"
                     >
-                      <ChevronRight className="w-5 h-5 text-neutral-800 dark:text-neutral-200" />
+                      <ChevronRight className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
@@ -282,7 +282,7 @@ export default function Projects({ projects }: ProjectsProps) {
                       href={selectedProject.githubUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex-1 md:flex-none inline-flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider py-3.5 px-6 theme-bg-sec hover:border-neutral-500/50 border theme-border theme-text-desc transition-all rounded-xl shadow-sm hover:shadow-md"
+                      className="flex-1 md:flex-none inline-flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider py-3.5 px-6 bg-white hover:bg-neutral-950 hover:text-white border border-neutral-300 hover:border-neutral-950 transition-all rounded-xl shadow-sm hover:shadow-md text-neutral-800 font-semibold"
                     >
                       <Github className="w-4 h-4" />
                       <span>Code Source</span>
@@ -356,7 +356,7 @@ export default function Projects({ projects }: ProjectsProps) {
               <div className="pt-12 border-t theme-border flex justify-center">
                 <button
                   onClick={handleBack}
-                  className="inline-flex items-center justify-center space-x-2 px-6 py-4 rounded-xl border theme-border theme-bg-sec hover:border-emerald-500/40 text-xs font-mono uppercase tracking-widest theme-text-title transition-all active:scale-95 cursor-pointer hover:shadow-md"
+                  className="inline-flex items-center justify-center space-x-2 px-6 py-4 rounded-xl bg-white hover:bg-neutral-950 hover:text-white border border-neutral-300 hover:border-neutral-950 transition-all text-xs font-mono uppercase tracking-widest text-neutral-800 font-semibold active:scale-95 cursor-pointer shadow-sm hover:shadow-md"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   <span>الرجوع للمتصفح / Return to Projects List</span>

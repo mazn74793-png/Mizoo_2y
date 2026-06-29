@@ -339,10 +339,10 @@ export default function Hero({ texts, scrollToSection, theme = 'dark' }: HeroPro
           </motion.button>
           
           <motion.button
-            whileHover={{ y: -3, scale: 1.02, bg: 'rgba(120, 120, 120, 0.05)' }}
+            whileHover={{ y: -3, scale: 1.02, backgroundColor: 'rgba(0, 0, 0, 0.04)' }}
             whileTap={{ scale: 0.98 }}
             onClick={() => scrollToSection('contact')}
-            className="text-xs font-mono uppercase tracking-wider py-4.5 px-10 border theme-border theme-text-muted hover:theme-text-title transition-colors rounded-lg w-full sm:w-auto backdrop-blur-sm cursor-pointer text-center"
+            className="text-xs font-mono uppercase tracking-wider py-4.5 px-10 border border-neutral-400 text-neutral-800 hover:text-black hover:border-black transition-colors rounded-lg w-full sm:w-auto backdrop-blur-sm cursor-pointer text-center font-medium"
           >
             Contact Me
           </motion.button>

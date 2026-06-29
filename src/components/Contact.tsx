@@ -74,7 +74,7 @@ export default function Contact({ socials, isAdminMode, setAdminMode, currentUse
               
               <button
                 onClick={handleCopyEmail}
-                className="flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider theme-text-desc hover:bg-neutral-950/5 dark:hover:bg-white/5 hover:text-neutral-950 dark:hover:text-white border theme-border hover:border-neutral-900/35 dark:hover:border-neutral-100/35 px-6 py-4.5 rounded transition-all w-full sm:w-auto cursor-pointer"
+                className="flex items-center justify-center space-x-2 text-xs font-mono uppercase tracking-wider text-neutral-800 hover:text-black hover:bg-black/5 border border-neutral-400 hover:border-black px-6 py-4.5 rounded transition-all w-full sm:w-auto cursor-pointer font-semibold"
               >
                 {copied ? <Check className="w-4 h-4 text-neutral-900 dark:text-neutral-150" /> : <Mail className="w-4 h-4" />}
                 <span>{copied ? 'Copied Secure' : 'Copy Email'}</span>

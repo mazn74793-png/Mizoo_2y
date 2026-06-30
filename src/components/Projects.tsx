@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Project } from '../types';
-import { ArrowUpRight, Github, ExternalLink, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowUpRight, Github, ExternalLink, X, ChevronLeft, ChevronRight, Lock, KeyRound, Eye, EyeOff } from 'lucide-react';
 
 interface ProjectsProps {
   projects: Project[];
@@ -14,8 +14,31 @@ export default function Projects({ projects }: ProjectsProps) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
+  // States for locked/private projects passcode handling
+  const [unlockedProjects, setUnlockedProjects] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem('unlocked_projects');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [showPasscodeModal, setShowPasscodeModal] = useState<boolean>(false);
+  const [pendingProject, setPendingProject] = useState<Project | null>(null);
+  const [passcodeInputValue, setPasscodeInputValue] = useState<string>('');
+  const [passcodeError, setPasscodeError] = useState<string>('');
+  const [showPasscodeText, setShowPasscodeText] = useState<boolean>(false);
+
   // Smoothly scroll and center the content when state transitions occur
   const handleSelectProject = (p: Project) => {
+    if (p.isPrivate && !unlockedProjects.includes(p.id)) {
+      setPendingProject(p);
+      setPasscodeInputValue('');
+      setPasscodeError('');
+      setShowPasscodeModal(true);
+      return;
+    }
+
     setSelectedProject(p);
     // Push history state to enable back button/swipe back navigation
     window.history.pushState({ view: 'project', id: p.id }, '', `#project-${p.id}`);
@@ -25,6 +48,35 @@ export default function Projects({ projects }: ProjectsProps) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }, 60);
+  };
+
+  const handleVerifyPasscode = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!pendingProject) return;
+
+    const correctCode = pendingProject.passcode || '';
+    if (passcodeInputValue.trim() === correctCode.trim()) {
+      const newUnlocked = [...unlockedProjects, pendingProject.id];
+      setUnlockedProjects(newUnlocked);
+      localStorage.setItem('unlocked_projects', JSON.stringify(newUnlocked));
+      
+      setSelectedProject(pendingProject);
+      window.history.pushState({ view: 'project', id: pendingProject.id }, '', `#project-${pendingProject.id}`);
+      
+      setShowPasscodeModal(false);
+      setPendingProject(null);
+      setPasscodeInputValue('');
+      setPasscodeError('');
+      
+      setTimeout(() => {
+        const el = document.getElementById('work');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 60);
+    } else {
+      setPasscodeError('الرمز السري غير صحيح. يرجى المحاولة مرة أخرى. / Incorrect passcode.');
+    }
   };
 
   const handleBack = () => {
@@ -49,7 +101,15 @@ export default function Projects({ projects }: ProjectsProps) {
       if (event.state && event.state.view === 'project') {
         const proj = projects.find(p => p.id === event.state.id);
         if (proj) {
-          setSelectedProject(proj);
+          if (proj.isPrivate && !unlockedProjects.includes(proj.id)) {
+            setSelectedProject(null);
+            setPendingProject(proj);
+            setPasscodeInputValue('');
+            setPasscodeError('');
+            setShowPasscodeModal(true);
+          } else {
+            setSelectedProject(proj);
+          }
           setTimeout(() => {
             const el = document.getElementById('work');
             if (el) {
@@ -74,8 +134,15 @@ export default function Projects({ projects }: ProjectsProps) {
       const id = hash.replace('#project-', '');
       const proj = projects.find(p => p.id === id);
       if (proj) {
-        setSelectedProject(proj);
-        window.history.replaceState({ view: 'project', id: proj.id }, '', hash);
+        if (proj.isPrivate && !unlockedProjects.includes(proj.id)) {
+          setPendingProject(proj);
+          setPasscodeInputValue('');
+          setPasscodeError('');
+          setShowPasscodeModal(true);
+        } else {
+          setSelectedProject(proj);
+          window.history.replaceState({ view: 'project', id: proj.id }, '', hash);
+        }
       }
     }
 
@@ -83,7 +150,7 @@ export default function Projects({ projects }: ProjectsProps) {
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [projects]);
+  }, [projects, unlockedProjects]);
 
   const handleScroll = () => {
     if (sliderRef.current) {
@@ -221,9 +288,18 @@ export default function Projects({ projects }: ProjectsProps) {
 
                             {/* Glass overlay on Hover */}
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-                              <span className="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-white border border-white/20 bg-black/45 px-3 py-1.5 rounded-full flex items-center space-x-1.5 backdrop-blur-md">
-                                <span>Explore Engine</span>
-                                <ArrowUpRight className="w-3.5 h-3.5" />
+                              <span className="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-white border border-white/20 bg-black/45 px-3 py-1.5 rounded-full flex items-center gap-2 backdrop-blur-md">
+                                {p.isPrivate && !unlockedProjects.includes(p.id) ? (
+                                  <>
+                                    <Lock className="w-3.5 h-3.5 text-amber-500" />
+                                    <span>مشروع خاص / Private</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span>Explore Engine</span>
+                                    <ArrowUpRight className="w-3.5 h-3.5" />
+                                  </>
+                                )}
                               </span>
                             </div>
                           </div>
@@ -248,8 +324,14 @@ export default function Projects({ projects }: ProjectsProps) {
                             </div>
 
                             {/* Title and brief */}
-                            <h3 className="text-xs sm:text-base font-sans font-medium theme-text-title tracking-tight transition-colors mb-1.5 flex items-center justify-between">
+                            <h3 className="text-xs sm:text-base font-sans font-medium theme-text-title tracking-tight transition-colors mb-1.5 flex items-center justify-between gap-2">
                               <span className="truncate">{p.title}</span>
+                              {p.isPrivate && (
+                                <span className="flex items-center gap-1 text-[8px] sm:text-[9px] font-mono uppercase tracking-wider text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded shrink-0">
+                                  <Lock className="w-2.5 h-2.5 text-amber-500" />
+                                  <span>{unlockedProjects.includes(p.id) ? 'مفتوح / Unlocked' : 'خاص / Private'}</span>
+                                </span>
+                              )}
                             </h3>
                             
                             <p className="text-[10.5px] sm:text-xs theme-text-desc leading-relaxed font-sans line-clamp-2">
@@ -416,6 +498,116 @@ export default function Projects({ projects }: ProjectsProps) {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Passcode Modal Dialog */}
+      <AnimatePresence>
+        {showPasscodeModal && (
+          <div className="fixed inset-0 z-55 flex items-center justify-center p-4">
+            {/* Dark glass backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => {
+                setShowPasscodeModal(false);
+                setPendingProject(null);
+                setPasscodeInputValue('');
+                setPasscodeError('');
+              }}
+              className="absolute inset-0 bg-black/85 backdrop-blur-md"
+            />
+
+            {/* Modal Body */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="relative w-full max-w-md overflow-hidden bg-[#0c0c0c] border border-neutral-900 rounded-2xl shadow-2xl p-6 sm:p-8 text-center z-10"
+            >
+              <div className="absolute top-4 right-4">
+                <button
+                  onClick={() => {
+                    setShowPasscodeModal(false);
+                    setPendingProject(null);
+                    setPasscodeInputValue('');
+                    setPasscodeError('');
+                  }}
+                  className="p-1.5 rounded-lg bg-neutral-950 border border-neutral-850 text-neutral-400 hover:text-white hover:border-neutral-700 transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="flex flex-col items-center">
+                {/* Visual lock icon illustration */}
+                <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-5 text-amber-500 animate-bounce">
+                  <Lock className="w-5 h-5" />
+                </div>
+
+                <h3 className="text-lg font-sans font-medium text-white tracking-tight mb-2">
+                  مشروع خاص ومحمي برمز مرور
+                </h3>
+                <p className="text-xs font-sans text-neutral-400 leading-relaxed mb-6">
+                  هذا المشروع خاص ومحمي بالكامل برمز سري. لفتحه والاطلاع على تفاصيله، يرجى كتابة الرمز الصحيح الذي حصلت عليه من الإدارة.
+                </p>
+
+                <form onSubmit={handleVerifyPasscode} className="w-full space-y-4">
+                  <div className="relative">
+                    <input
+                      type={showPasscodeText ? "text" : "password"}
+                      autoFocus
+                      required
+                      placeholder="أدخل رمز المرور / Enter passcode..."
+                      value={passcodeInputValue}
+                      onChange={(e) => {
+                        setPasscodeInputValue(e.target.value);
+                        if (passcodeError) setPasscodeError('');
+                      }}
+                      className="w-full bg-neutral-950 border border-neutral-850 p-3 px-10 rounded-xl text-sm text-center text-white outline-none focus:border-amber-500/50 transition-all font-mono tracking-widest"
+                    />
+                    <div className="absolute left-3.5 top-3.5 text-neutral-500">
+                      <KeyRound className="w-4 h-4" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowPasscodeText(!showPasscodeText)}
+                      className="absolute right-3.5 top-3.5 text-neutral-500 hover:text-white transition-colors"
+                    >
+                      {showPasscodeText ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+
+                  {passcodeError && (
+                    <p className="text-xs text-red-500 font-sans">{passcodeError}</p>
+                  )}
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowPasscodeModal(false);
+                        setPendingProject(null);
+                        setPasscodeInputValue('');
+                        setPasscodeError('');
+                      }}
+                      className="flex-1 py-3 px-4 rounded-xl border border-neutral-850 hover:bg-neutral-800 hover:text-white text-neutral-400 text-xs font-mono uppercase tracking-wider transition-all cursor-pointer"
+                    >
+                      إلغاء / Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-neutral-950 font-semibold text-xs font-mono uppercase tracking-wider transition-all cursor-pointer active:scale-98 shadow-lg shadow-amber-500/15"
+                    >
+                      فتح / Unlock
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

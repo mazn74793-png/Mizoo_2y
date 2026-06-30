@@ -10,7 +10,7 @@ import { collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy } from '
 import { Project, Skill, Service, Testimonial, SocialLink, TextConfig, OperationType } from '../types';
 import { 
   Plus, Edit, Trash2, Save, X, Layers, Sparkles, Database, Mail, 
-  Code, Eye, Upload, AlertCircle, Files, Settings, UserCheck, User, RefreshCw
+  Code, Eye, Upload, AlertCircle, Files, Settings, UserCheck, User, RefreshCw, Lock
 } from 'lucide-react';
 
 const metaEnv = (import.meta as any).env || {};
@@ -249,6 +249,8 @@ export default function AdminDashboard({
     caseStudy: '',
     order: 0,
     featured: true,
+    isPrivate: false,
+    passcode: '',
     // Skill keys
     name: '',
     category: 'frontend',
@@ -652,6 +654,8 @@ export default function AdminDashboard({
       caseStudy: '',
       order: 0,
       featured: true,
+      isPrivate: false,
+      passcode: '',
       name: '',
       category: 'frontend',
       icon: 'Cpu',
@@ -674,6 +678,8 @@ export default function AdminDashboard({
     
     // Adapt details based on standard models
     setFormData({
+      isPrivate: false,
+      passcode: '',
       ...item,
       techStack: item.techStack ? item.techStack.join(', ') : '',
       features: item.features ? item.features.join(', ') : '',
@@ -713,6 +719,8 @@ export default function AdminDashboard({
           caseStudy: formData.caseStudy || '',
           order: Number(formData.order) || 0,
           featured: Boolean(formData.featured),
+          isPrivate: Boolean(formData.isPrivate),
+          passcode: formData.passcode || '',
           updatedAt: new Date().toISOString()
         };
       } else if (activeTab === 'skills') {
@@ -1128,16 +1136,44 @@ export default function AdminDashboard({
                         />
                       </div>
 
-                      <div className="flex items-center space-x-3 pt-6">
-                        <input
-                          type="checkbox"
-                          id="featured-check"
-                          checked={formData.featured}
-                          onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                          className="w-4 h-4 rounded border-neutral-800"
-                        />
-                        <label htmlFor="featured-check" className="text-xs font-mono uppercase text-neutral-400">Mark as Featured</label>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-6 pt-6">
+                        <div className="flex items-center space-x-3">
+                          <input
+                            type="checkbox"
+                            id="featured-check"
+                            checked={formData.featured}
+                            onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                            className="w-4 h-4 rounded border-neutral-800"
+                          />
+                          <label htmlFor="featured-check" className="text-xs font-mono uppercase text-neutral-400">Mark as Featured</label>
+                        </div>
+
+                        <div className="flex items-center space-x-3">
+                          <input
+                            type="checkbox"
+                            id="private-check"
+                            checked={formData.isPrivate || false}
+                            onChange={(e) => setFormData({ ...formData, isPrivate: e.target.checked })}
+                            className="w-4 h-4 rounded border-neutral-800"
+                          />
+                          <label htmlFor="private-check" className="text-xs font-mono uppercase text-neutral-400">Private Project / مشروع خاص</label>
+                        </div>
                       </div>
+
+                      {formData.isPrivate && (
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-mono uppercase text-neutral-500 max-w-xs block">Project Passcode / رمز المرور للمشروع</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="مثال: 1234"
+                            value={formData.passcode || ''}
+                            onChange={(e) => setFormData({ ...formData, passcode: e.target.value })}
+                            className="w-full bg-neutral-950 border border-neutral-850 p-3 rounded text-xs text-white"
+                          />
+                          <p className="text-[10px] text-amber-500">ملاحظة: هذا المشروع لن يتمكن الزوار من تصفحه إلا بعد إدخال الرمز السري المحدد أعلاه.</p>
+                        </div>
+                      )}
                     </>
                   )}
 
@@ -1563,7 +1599,15 @@ export default function AdminDashboard({
                 <div className="flex items-center space-x-3 text-left">
                   <img src={p.imageUrl} alt="" className="w-10 h-10 rounded object-cover border border-neutral-800" referrerPolicy="no-referrer" />
                   <div>
-                    <h4 className="text-xs font-sans font-medium text-white tracking-tight">{p.title}</h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-xs font-sans font-medium text-white tracking-tight">{p.title}</h4>
+                      {p.isPrivate && (
+                        <span className="flex items-center text-[8px] font-mono uppercase tracking-wider text-amber-500 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">
+                          <Lock className="w-2.5 h-2.5 mr-1 text-amber-500" />
+                          <span>خاص / Private</span>
+                        </span>
+                      )}
+                    </div>
                     <span className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest">{p.techStack.join(', ')}</span>
                   </div>
                 </div>

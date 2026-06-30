@@ -10,6 +10,8 @@ export interface Project {
   caseStudy?: string;
   order: number;
   featured: boolean;
+  isPrivate?: boolean;
+  passcode?: string;
   updatedAt?: string;
 }
 

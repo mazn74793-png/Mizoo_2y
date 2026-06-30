@@ -6,31 +6,31 @@ interface AboutProps {
   texts: TextConfig[];
 }
 
+const PILLARS = [
+  {
+    icon: Layers,
+    title: 'Pristine Layout Mechanics',
+    desc: 'Obsessive grid ratios, tailored lettering pairs, and carefully calibrated margins that feel lightweight yet structure-strong.'
+  },
+  {
+    icon: Cpu,
+    title: 'Deterministic Flow',
+    desc: 'Writing highly performant React code that completely avoids infinite re-renders, resulting in stable, responsive rendering speeds.'
+  },
+  {
+    icon: Activity,
+    title: 'Cinematic Micro-Interactions',
+    desc: 'Subtle hover states, fluid container morph transformations, and premium inertia scrolling that respect natural material friction.'
+  },
+  {
+    icon: Sparkles,
+    title: 'Zero-Trust Resilient Archs',
+    desc: 'Safeguarding databases with rigorous attribute-based access rules and building sub-50ms real-time synchronization pipelines.'
+  }
+];
+
 export default function About({ texts }: AboutProps) {
   const storyText = texts.find(t => t.key === 'story-short')?.value || 'I merge high-precision system mechanics with elite aesthetic sensitivity. Drawing inspiration from modern giants like Apple, Stripe and Linear, I believe complex applications must load with zero friction and represent premium durability.';
-
-  const PILLARS = [
-    {
-      icon: Layers,
-      title: 'Pristine Layout Mechanics',
-      desc: 'Obsessive grid ratios, tailored lettering pairs, and carefully calibrated margins that feel lightweight yet structure-strong.'
-    },
-    {
-      icon: Cpu,
-      title: 'Deterministic Flow',
-      desc: 'Writing highly performant React code that completely avoids infinite re-renders, resulting in stable, responsive rendering speeds.'
-    },
-    {
-      icon: Activity,
-      title: 'Cinematic Micro-Interactions',
-      desc: 'Subtle hover states, fluid container morph transformations, and premium inertia scrolling that respect natural material friction.'
-    },
-    {
-      icon: Sparkles,
-      title: 'Zero-Trust Resilient Archs',
-      desc: 'Safeguarding databases with rigorous attribute-based access rules and building sub-50ms real-time synchronization pipelines.'
-    }
-  ];
 
   return (
     <section 

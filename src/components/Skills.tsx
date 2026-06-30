@@ -7,6 +7,13 @@ interface SkillsProps {
   skills: Skill[];
 }
 
+const CATEGORIES = [
+  { id: 'all', label: 'All Tech' },
+  { id: 'frontend', label: 'Frontend & UI' },
+  { id: 'backend', label: 'Backend & Data' },
+  { id: 'tools', label: 'Tools & DevOps' },
+] as const;
+
 export default function Skills({ skills }: SkillsProps) {
   const [activeCategory, setActiveCategory] = useState<'all' | 'frontend' | 'backend' | 'tools'>('all');
 
@@ -20,13 +27,6 @@ export default function Skills({ skills }: SkillsProps) {
     if (activeCategory === 'all') return true;
     return s.category === activeCategory;
   });
-
-  const categories = [
-    { id: 'all', label: 'All Tech' },
-    { id: 'frontend', label: 'Frontend & UI' },
-    { id: 'backend', label: 'Backend & Data' },
-    { id: 'tools', label: 'Tools & DevOps' },
-  ] as const;
 
   return (
     <section 
@@ -48,7 +48,7 @@ export default function Skills({ skills }: SkillsProps) {
 
           {/* Sub-pixel category slide selectors */}
           <div className="flex flex-wrap items-center theme-bg-sec border theme-border p-1 rounded-lg self-start">
-            {categories.map((cat) => (
+            {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}

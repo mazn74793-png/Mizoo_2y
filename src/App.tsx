@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { db, handleFirestoreError, DEFAULT_PROJECTS, DEFAULT_SKILLS, DEFAULT_SERVICES, DEFAULT_TESTIMONIALS, DEFAULT_SOCIALS, DEFAULT_TEXTS, auth, googleProvider } from './firebase';
+import { db, DEFAULT_PROJECTS, DEFAULT_SKILLS, DEFAULT_SERVICES, DEFAULT_TESTIMONIALS, DEFAULT_SOCIALS, DEFAULT_TEXTS, auth, googleProvider } from './firebase';
 import { collection, onSnapshot, query, orderBy, doc, setDoc } from 'firebase/firestore';
 import { signInWithPopup, signOut, User } from 'firebase/auth';
 import { motion, AnimatePresence } from 'motion/react';

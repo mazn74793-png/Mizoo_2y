@@ -777,7 +777,14 @@ export default function AdminDashboard({
     { id: 'portrait', label: 'Hero Portrait', icon: User },
   ] as const;
 
-  const isDatabaseEmpty = projectsCount <= 0 || skillsCount <= 0 || servicesCount <= 0;
+  const isDataLoading = projectsCount === -1 || 
+                        skillsCount === -1 || 
+                        servicesCount === -1 || 
+                        testimonialsCount === -1 || 
+                        socialsCount === -1 || 
+                        textsCount === -1;
+
+  const isDatabaseEmpty = !isDataLoading && (projectsCount <= 0 || skillsCount <= 0 || servicesCount <= 0);
 
   return (
     <div className="min-h-screen bg-[#050505] text-white pt-24 pb-16 flex flex-col font-sans select-none">
@@ -836,47 +843,79 @@ export default function AdminDashboard({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Project counts panel */}
-            <div className="bg-[#080808] border border-neutral-900/80 rounded-xl p-4 flex flex-col justify-between">
-              <div>
-                <span className="text-[9px] font-mono uppercase text-neutral-500 tracking-wider">PROJECTS INDEX</span>
-                <p className="text-lg font-sans font-medium text-white mt-1">
-                  {projectsCount >= 0 ? `${projectsCount} مشاريع حية` : 'جاري جرد السجلات...'}
-                </p>
-              </div>
-              <p className="text-[10px] text-neutral-500 mt-2 font-mono">
-                {projectsCount > 0 ? '✓ سحابية نشطة حية' : '⚠️ ذاكرة تخزين الكود'}
-              </p>
+            <div className="bg-[#080808] border border-neutral-900/80 rounded-xl p-4 flex flex-col justify-between min-h-[100px]">
+              {isDataLoading ? (
+                <div className="space-y-3 animate-pulse">
+                  <div className="h-2.5 bg-neutral-900 rounded w-1/2"></div>
+                  <div className="h-4 bg-neutral-900 rounded w-3/4"></div>
+                  <div className="h-2 bg-neutral-900 rounded w-1/3"></div>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <span className="text-[9px] font-mono uppercase text-neutral-500 tracking-wider">PROJECTS INDEX</span>
+                    <p className="text-lg font-sans font-medium text-white mt-1">
+                      {projectsCount >= 0 ? `${projectsCount} مشاريع حية` : 'جاري جرد السجلات...'}
+                    </p>
+                  </div>
+                  <p className="text-[10px] text-neutral-500 mt-2 font-mono">
+                    {projectsCount > 0 ? '✓ سحابية نشطة حية' : '⚠️ ذاكرة تخزين الكود'}
+                  </p>
+                </>
+              )}
             </div>
 
             {/* Skills count panel */}
-            <div className="bg-[#080808] border border-neutral-900/80 rounded-xl p-4 flex flex-col justify-between">
-              <div>
-                <span className="text-[9px] font-mono uppercase text-neutral-500 tracking-wider">SKILLS GRID</span>
-                <p className="text-lg font-sans font-medium text-white mt-1">
-                  {skillsCount >= 0 ? `${skillsCount} مهارات حية` : 'جاري جرد السجلات...'}
-                </p>
-              </div>
-              <p className="text-[10px] text-neutral-500 mt-2 font-mono">
-                {skillsCount > 0 ? '✓ سحابية نشطة حية' : '⚠️ ذاكرة تخزين الكود'}
-              </p>
+            <div className="bg-[#080808] border border-neutral-900/80 rounded-xl p-4 flex flex-col justify-between min-h-[100px]">
+              {isDataLoading ? (
+                <div className="space-y-3 animate-pulse">
+                  <div className="h-2.5 bg-neutral-900 rounded w-1/2"></div>
+                  <div className="h-4 bg-neutral-900 rounded w-3/4"></div>
+                  <div className="h-2 bg-neutral-900 rounded w-1/3"></div>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <span className="text-[9px] font-mono uppercase text-neutral-500 tracking-wider">SKILLS GRID</span>
+                    <p className="text-lg font-sans font-medium text-white mt-1">
+                      {skillsCount >= 0 ? `${skillsCount} مهارات حية` : 'جاري جرد السجلات...'}
+                    </p>
+                  </div>
+                  <p className="text-[10px] text-neutral-500 mt-2 font-mono">
+                    {skillsCount > 0 ? '✓ سحابية نشطة حية' : '⚠️ ذاكرة تخزين الكود'}
+                  </p>
+                </>
+              )}
             </div>
 
             {/* UI copy texts counts panel */}
-            <div className="bg-[#080808] border border-neutral-900/80 rounded-xl p-4 flex flex-col justify-between">
-              <div>
-                <span className="text-[9px] font-mono uppercase text-neutral-500 tracking-wider">UI COPY KEYS</span>
-                <p className="text-lg font-sans font-medium text-white mt-1">
-                  {textsCount >= 0 ? `${textsCount} نصوص حية` : 'جاري جرد السجلات...'}
-                </p>
-              </div>
-              <p className="text-[10px] text-neutral-500 mt-2 font-mono">
-                {textsCount > 0 ? '✓ سحابية نشطة حية' : '⚠️ ذاكرة تخزين الكود'}
-              </p>
+            <div className="bg-[#080808] border border-neutral-900/80 rounded-xl p-4 flex flex-col justify-between min-h-[100px]">
+              {isDataLoading ? (
+                <div className="space-y-3 animate-pulse">
+                  <div className="h-2.5 bg-neutral-900 rounded w-1/2"></div>
+                  <div className="h-4 bg-neutral-900 rounded w-3/4"></div>
+                  <div className="h-2 bg-neutral-900 rounded w-1/3"></div>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <span className="text-[9px] font-mono uppercase text-neutral-500 tracking-wider">UI COPY KEYS</span>
+                    <p className="text-lg font-sans font-medium text-white mt-1">
+                      {textsCount >= 0 ? `${textsCount} نصوص حية` : 'جاري جرد السجلات...'}
+                    </p>
+                  </div>
+                  <p className="text-[10px] text-neutral-500 mt-2 font-mono">
+                    {textsCount > 0 ? '✓ سحابية نشطة حية' : '⚠️ ذاكرة تخزين الكود'}
+                  </p>
+                </>
+              )}
             </div>
 
             {/* Quick action trigger block */}
-            <div className="bg-[#0c0c0c] border border-neutral-900 rounded-xl p-4 flex flex-col justify-center space-y-2">
-              {isDatabaseEmpty ? (
+            <div className="bg-[#0c0c0c] border border-neutral-900 rounded-xl p-4 flex flex-col justify-center space-y-2 min-h-[100px]">
+              {isDataLoading ? (
+                <div className="animate-pulse h-10 bg-neutral-900 rounded-lg w-full"></div>
+              ) : isDatabaseEmpty ? (
                 <button
                   type="button"
                   onClick={handleSeedDatabase}
@@ -1496,8 +1535,27 @@ export default function AdminDashboard({
 
           {/* List display grid area */}
           <div className="flex-1 space-y-3">
-            
-            {activeTab === 'projects' && liveProjects.map((p) => (
+            {isDataLoading ? (
+              <div className="space-y-4 animate-pulse">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex items-center justify-between p-4 bg-neutral-950 border border-neutral-900 rounded-lg">
+                    <div className="flex items-center space-x-4 w-full">
+                      <div className="w-10 h-10 bg-neutral-900 rounded border border-neutral-850 shrink-0"></div>
+                      <div className="space-y-2 flex-1 max-w-xs">
+                        <div className="h-3.5 bg-neutral-900 rounded w-2/3"></div>
+                        <div className="h-2.5 bg-neutral-900 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2 shrink-0">
+                      <div className="w-8 h-8 bg-neutral-900/60 rounded border border-neutral-850"></div>
+                      <div className="w-8 h-8 bg-neutral-900/60 rounded border border-neutral-850"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <>
+                {activeTab === 'projects' && liveProjects.map((p) => (
               <div 
                 key={p.id}
                 className="flex items-center justify-between p-4 bg-neutral-950 border border-neutral-900 rounded-lg hover:border-neutral-800 transition-colors"
@@ -1789,7 +1847,9 @@ export default function AdminDashboard({
 
               </div>
             )}
-          </div>
+          </>
+        )}
+      </div>
 
         </div>
       </div>

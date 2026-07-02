@@ -15,6 +15,17 @@ import {
 
 const metaEnv = (import.meta as any).env || {};
 
+// Helper to hash a string to SHA-256 hex format
+async function hashSHA256(text: string): Promise<string> {
+  if (!text) return '';
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
+}
+
 interface AdminDashboardProps {
   projects: Project[];
   skills: Skill[];
@@ -707,6 +718,14 @@ export default function AdminDashboard({
 
     try {
       if (activeTab === 'projects') {
+        let finalPasscode = formData.passcode || '';
+        if (formData.isPrivate && finalPasscode) {
+          const isAlreadyHashed = /^[a-f0-9]{64}$/i.test(finalPasscode);
+          if (!isAlreadyHashed) {
+            finalPasscode = await hashSHA256(finalPasscode);
+          }
+        }
+
         payload = {
           id,
           title: formData.title,
@@ -720,7 +739,7 @@ export default function AdminDashboard({
           order: Number(formData.order) || 0,
           featured: Boolean(formData.featured),
           isPrivate: Boolean(formData.isPrivate),
-          passcode: formData.passcode || '',
+          passcode: finalPasscode,
           updatedAt: new Date().toISOString()
         };
       } else if (activeTab === 'skills') {
@@ -1171,7 +1190,7 @@ export default function AdminDashboard({
                             onChange={(e) => setFormData({ ...formData, passcode: e.target.value })}
                             className="w-full bg-neutral-950 border border-neutral-850 p-3 rounded text-xs text-white"
                           />
-                          <p className="text-[10px] text-amber-500">ملاحظة: هذا المشروع لن يتمكن الزوار من تصفحه إلا بعد إدخال الرمز السري المحدد أعلاه.</p>
+                          <p className="text-[10px] text-amber-500">ملاحظة: هذا المشروع لن يتمكن الزوار من تصفحه إلا بعد إدخال الرمز السري المحدد. يتم تخزين الرمز بشكل آمن ومشفر للغاية (SHA-256) لحمايته من أي محاولة استخراج أو اختراق. لتغييره، اكتب الرمز الجديد مباشرة هنا.</p>
                         </div>
                       )}
                     </>

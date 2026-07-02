@@ -3,6 +3,17 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Project } from '../types';
 import { ArrowUpRight, Github, ExternalLink, X, ChevronLeft, ChevronRight, Lock, KeyRound, Eye, EyeOff } from 'lucide-react';
 
+// Helper to hash a string to SHA-256 hex format
+async function hashSHA256(text: string): Promise<string> {
+  if (!text) return '';
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
+}
+
 interface ProjectsProps {
   projects: Project[];
 }
@@ -14,15 +25,8 @@ export default function Projects({ projects }: ProjectsProps) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  // States for locked/private projects passcode handling
-  const [unlockedProjects, setUnlockedProjects] = useState<string[]>(() => {
-    try {
-      const stored = localStorage.getItem('unlocked_projects');
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+  // States for locked/private projects passcode handling (securely held in-memory, never persisted to localStorage)
+  const [unlockedProjects, setUnlockedProjects] = useState<string[]>([]);
   const [showPasscodeModal, setShowPasscodeModal] = useState<boolean>(false);
   const [pendingProject, setPendingProject] = useState<Project | null>(null);
   const [passcodeInputValue, setPasscodeInputValue] = useState<string>('');
@@ -50,15 +54,28 @@ export default function Projects({ projects }: ProjectsProps) {
     }, 60);
   };
 
-  const handleVerifyPasscode = (e?: React.FormEvent) => {
+  const handleVerifyPasscode = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!pendingProject) return;
 
-    const correctCode = pendingProject.passcode || '';
-    if (passcodeInputValue.trim() === correctCode.trim()) {
+    const storedCode = pendingProject.passcode || '';
+    const enteredInput = passcodeInputValue.trim();
+    
+    // Check if the stored code is a SHA-256 hash (64 hex characters)
+    const isStoredHashed = /^[a-f0-9]{64}$/i.test(storedCode);
+    let isMatch = false;
+
+    if (isStoredHashed) {
+      const hashedEnteredInput = await hashSHA256(enteredInput);
+      isMatch = hashedEnteredInput === storedCode;
+    } else {
+      // Fallback backward-compatible match for plain-text passcodes
+      isMatch = enteredInput === storedCode.trim();
+    }
+
+    if (isMatch) {
       const newUnlocked = [...unlockedProjects, pendingProject.id];
       setUnlockedProjects(newUnlocked);
-      localStorage.setItem('unlocked_projects', JSON.stringify(newUnlocked));
       
       setSelectedProject(pendingProject);
       window.history.pushState({ view: 'project', id: pendingProject.id }, '', `#project-${pendingProject.id}`);
@@ -80,6 +97,9 @@ export default function Projects({ projects }: ProjectsProps) {
   };
 
   const handleBack = () => {
+    // Lock all projects immediately when returning back to list
+    setUnlockedProjects([]);
+    
     if (window.history.state?.view === 'project') {
       window.history.back();
     } else {
@@ -119,6 +139,7 @@ export default function Projects({ projects }: ProjectsProps) {
         }
       } else {
         setSelectedProject(null);
+        setUnlockedProjects([]); // Lock everything again immediately!
         setTimeout(() => {
           const el = document.getElementById('work');
           if (el) {
